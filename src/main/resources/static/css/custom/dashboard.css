@@ -1,0 +1,147 @@
+.dashboard .page-header {
+  background-image: url("../../images/dashboard2-header.jpg");
+  background-size: cover; }
+
+.dashboard .card, .dashboard .panel {
+  height: calc(100% - 30px); }
+
+#widgetLinearea .ct-chart .ct-label.ct-vertical, #widgetLinearea .ct-chart .ct-label.ct-horizontal {
+  font-size: 14px; }
+
+#widgetLinearea .ct-chart .ct-area {
+  fill-opacity: 1; }
+
+#widgetLinearea .ct-chart .ct-series.ct-series-a .ct-area {
+  fill: #b8d7ff; }
+
+#widgetLinearea .ct-chart .ct-series.ct-series-b .ct-area {
+  fill: #92f0e6; }
+
+#widgetLinearea ul .icon {
+  vertical-align: text-bottom; }
+
+#widgetGmap {
+  overflow: hidden; }
+  #widgetGmap .map {
+    border: none;
+    padding: 0; }
+.badge-link{
+	cursor: pointer;
+}
+.footable > tfoot .pagination a {
+    position: relative;
+    float: left;
+    padding: 5px 10px;
+    margin-left: -1px;
+    line-height: 1.57142857;
+    color: #76838f;
+    text-decoration: none;
+    background-color: transparent;
+    border: 1px solid #e4eaec;
+}
+
+.footable .footable-last-visible{
+	text-align: center;
+}
+.notice-title{
+	color: black !important;
+}
+.footable-empty{
+	text-align: center;
+}
+#teacherList tbody tr td:nth-child(4) {
+	text-align: center;
+}
+#teacherList tbody tr td:nth-child(5) {
+	text-align: center;
+}
+#teacherList tbody tr td:nth-child(6) {
+	text-align: center;
+}
+#teacherList tbody tr td:nth-child(7) {
+	text-align: center;
+}
+#teacherList tbody tr td:nth-child(8) {
+	text-align: center;
+}
+.footable-details tbody tr th{
+	width: 50%;
+}
+
+#personalCompletedWidget {
+    height: -webkit-calc(100% - 30px);
+    height: calc(100% - 30px);
+}
+#personalCompletedWidget .card-block {
+    padding: 2.143rem
+}
+#personalCompletedWidget .table {
+    margin-bottom: 0;
+}
+#personalCompletedWidget .table td {
+    padding: 20px 0 19px;
+    width: 40%;
+}
+#personalCompletedWidget .progress {
+    display: inline-block;
+    width: 100%;
+    vertical-align: middle;
+}
+#personalCompletedWidget .table td:last-child {
+    width: 20%;
+    text-align: right;
+}
+#personalCompletedWidget .table td {
+    padding: 20px 0 19px;
+    width: 40%;
+}
+.mobile-toggle {
+	display: none;
+}
+@media (max-width: 418px){
+.mobile-hight-auto{
+	min-height: fit-content;
+	height: auto !important;
+}
+.page-content {
+    padding: 0px;
+}
+.card-body{
+	padding: 5px;]
+}
+}
+@media (max-width: 768px){
+.card {
+    margin-bottom: 0rem;
+    border: none;
+    box-shadow: none;
+}
+.mobile-notice{
+	padding: .858rem 1.429rem;
+}
+.mobile-p-b-10{
+	padding-bottom: 10px !important;
+}
+.card-lg .card-header {
+	padding: .858rem 1.429rem;
+}
+#personalCompletedWidget {
+	height: 100%
+}
+.media {
+    -ms-flex-direction: inherit;
+    flex-direction: inherit;
+}
+.mobile-toggle {
+	display: inherit;
+}
+.pc-toggle {
+	display: none;
+}
+.dashboard .card, .dashboard .panel {
+    height: calc(100%);
+}
+.max-height-300{
+	max-height: 300px;
+}
+}

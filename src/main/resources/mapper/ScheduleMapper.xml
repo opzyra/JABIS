@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.scheduling.ScheduleDao">
+	
+	<update id="updateGrade">
+		UPDATE 
+			STUDENT, SIBLING	
+		SET
+			STUDENT.GRADE = STUDENT.GRADE + 1,
+			SIBLING.GRADE = SIBLING.GRADE + 1
+	</update>
+	
+	<update id="updateStudentSchool">
+		UPDATE 
+			STUDENT
+		SET
+			GRADE_CODE = GRADE_CODE + 1,
+			GRADE = 1,
+			SCHOOL = '미입력'
+		WHERE
+			(GRADE_CODE = 1 AND GRADE = 7) OR
+			(GRADE_CODE = 2 AND GRADE = 4)
+	</update>
+	
+	<update id="updateSiblingSchool">
+		UPDATE 
+			SIBLING
+		SET
+			GRADE_CODE = GRADE_CODE + 1,
+			GRADE = 1,
+			SCHOOL = '미입력'
+		WHERE
+			(GRADE_CODE = 1 AND GRADE = 7) OR
+			(GRADE_CODE = 2 AND GRADE = 4)
+	</update>
+
+</mapper>

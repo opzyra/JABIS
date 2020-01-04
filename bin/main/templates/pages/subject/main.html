@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" 
+xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{layout/app_layout.html}" 
+th:with="
+title='JABIS', 
+bodyClass='animsition app-work site-navbar-small',  
+menu='#menuConfig, #menuSubject'
+">
+
+<th:block layout:fragment="page">
+
+<div id="subjectVue" class="page">
+	<div class="page-content container-fluid">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+					<div class="panel-header">
+						<h3 class="m-t-0">과목 설정</h3>
+						<div><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>성적 등록에 필요한 과목 정보를 입력합니다.</div> 
+						<div><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>성적 차트의 과목의 순서와 동일합니다.</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-3">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+					<div class="counter counter-lg m-b-15">
+		              <div class="counter-label text-uppercase">등록된 과목 수</div>
+		              <div class="counter-number-group">
+		                <span class="counter-number" v-text="subject.length"></span>
+		              </div>
+		            </div>
+					<button type="button" class="btn btn-icon btn-block btn-primary btn-outline" v-on:click="openModalAddSubject()" v-if="orderMode == false && modifyMode == false"><i class="icon fa-plus m-r-5" aria-hidden="true"></i>신규 과목</button>
+					<button type="button" class="btn btn-icon btn-block btn-primary btn-outline" v-on:click="subjectModifyMode()" v-if="orderMode == false && modifyMode == false"><i class="icon wb-pencil m-r-5" aria-hidden="true"></i>과목 수정</button>
+					<button type="button" class="btn btn-icon btn-block btn-success btn-outline" v-on:click="subjectModifySuccess()" v-if="modifyMode == true"><i class="icon fa-check m-r-5" aria-hidden="true"></i>수정 완료</button>
+					<button type="button" class="btn btn-icon btn-block btn-primary btn-outline" v-on:click="orderModifyMode()" v-if="orderMode == false && modifyMode == false"><i class="icon fa-arrows m-r-5" aria-hidden="true"></i>순서 변경</button>
+					<button type="button" class="btn btn-icon btn-block btn-success btn-outline" v-on:click="orderModifySuccess()" v-if="orderMode == true"><i class="icon fa-check m-r-5" aria-hidden="true"></i>변경 완료</button>
+					<button type="button" class="btn btn-icon btn-block btn-danger btn-outline" v-on:click="cancleMode()" v-if="orderMode == true || modifyMode == true"><i class="icon fa-check m-r-5" aria-hidden="true"></i>작업 취소</button>
+				</div>
+			</div>
+			<div class="col-lg-9 p-b-0">
+				<div class="panel p-25 m-b-0">
+					<table class="table" id="drag">
+			            <thead>
+			              <tr>
+			                <th width="20%">과목명</th>
+			                <th>설명</th>
+			              </tr>
+			            </thead>
+			            <tbody>
+			              <tr v-for="item in subject" v-bind:data-idx="item.idx">
+			              	<td>
+			              		<span v-text="item.name"></span>
+			              		<span class="class-help" v-if="modifyMode == true">
+			                		<button type="button" class="btn btn-pure btn-default icon wb-pencil p-0 btn-edit" v-on:click="openModalUpdateSubject(item.idx, item.name)"></button>
+			                	</span>
+			                	<span class="class-help" v-if="orderMode == true">
+			                		<i class="icon fa-arrows" aria-hidden="true"></i>
+			                	</span>
+			                	
+			              	</td>
+			              	<td v-text="item.description"></td>
+			              </tr>
+			            </tbody>
+			          </table>
+			          <div class="m-t-10">
+			          	<ul id="pagination" class="pagination pagination-sm pagination-gap"></ul>
+			          </div>
+				</div>
+			</div>
+		</div>
+	</div>  
+	
+	<!-- Modal -->
+	<div class="modal fade modal-primary" id="addSubject" aria-hidden="true" aria-labelledby="addSubject" role="dialog" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">×</span>
+					</button>
+					<h4 class="modal-title">과목 추가</h4>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+						<label for="className" class="form-control-label">과목명</label>
+                		<input type="text" id="name" name="name" placeholder="과목명을 입력해 주세요." class="form-control" maxlength="20" v-model="name">
+					</div>
+					<div class="form-group">
+						<label for="className" class="form-control-label">설명</label>
+                		<input type="text" id="description" name="description" placeholder="설명을 입력해 주세요." class="form-control" maxlength="20" v-model="description">
+					</div>
+				</div>	
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" v-on:click="addSubject()">추가</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">취소</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End Modal -->
+	
+	<!-- Modal -->
+	<div class="modal fade modal-primary" id="updateSubject" aria-hidden="true" aria-labelledby="updateSubject" role="dialog" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">×</span>
+					</button>
+					<h4 class="modal-title">과목 변경</h4>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+						<label for="className" class="form-control-label">변경 전 과목명</label>
+                		<input type="text" id="modalUpdateOriginClassName" name="modalUpdateOriginClassName" class="form-control" disabled="disabled" v-model="updateOldName">
+					</div>
+					<div class="form-group">
+						<label for="className" class="form-control-label">변경 후 과목명<span class="f-s-12 m-l-5 text-danger">※ 설명만 변경시 공란</span></label>
+                		<input type="text" id="modalUpdateClassName" name="modalUpdateClassName" placeholder="변경할 과목명을 입력해 주세요." class="form-control" maxlength="20" v-model="updateName">
+					</div>
+					<div class="form-group">
+						<label for="className" class="form-control-label">변경 후 설명<span class="f-s-12 m-l-5 text-danger">※ 과목명만 변경시 공란</span></label>
+                		<input type="text" id="className" name="className" placeholder="변경할 설명을 입력해 주세요." class="form-control" maxlength="20" v-model="updateDescription">
+					</div>
+				</div>	
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" v-on:click="updateSubject()">변경</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">취소</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End Modal -->
+	
+</div>
+
+</th:block>
+
+<th:block layout:fragment="vuejs">
+	<script th:attr="src=@{'/js/vue/subjectVue.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customScript">
+	<script th:attr="src=@{'/js/common/Plugin/toolbar.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+	<script th:attr="src=@{'/js/custom/subject.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customStyle">
+	<link rel="stylesheet" th:attr="href=@{'/css/custom/subject.css?ver=' + ${@environment.getProperty('app.version')}}">
+</th:block>
+
+</html>

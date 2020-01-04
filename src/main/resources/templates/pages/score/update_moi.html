@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" 
+xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{layout/app_layout.html}" 
+th:with="
+title='JABIS', 
+bodyClass='animsition page-project student-edit site-navbar-small', 
+menu='#menuStudent, #menuScore'
+">
+<th:block layout:fragment="page">
+<input type="hidden" id="studentIdx" th:value="${studentIdx}">
+<input type="hidden" id="scoreIdx" th:value="${scoreIdx}">
+<div id="scoreUpdateMoiVue" class="page">
+	
+	<div class="page-content container-fluid">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+					<div class="row">
+						<div class="col-lg-7">
+							<div class="panel-header">
+								<h3 class="m-t-0">
+									성적 수정
+									<span class="mobile-filter m-l-5"><i class="icon fa-warning" aria-hidden="true"></i></span>
+								</h3> 
+								<div>
+									<i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>선택된 학생의 성적을 수정합니다.</div> <div>
+									<i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>정확한 데이터 구축을 위해 성적 입력시 주의 사항을 꼭 읽어주세요.</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-5 panel-header-help">
+							<button type="button" class="btn btn-danger" v-on:click="deleteScore()">삭제</button>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+			<div class="col-lg-7">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+				<h4 class="m-t-0"><i aria-hidden="true" class="icon fa-tag m-r-5 text-primary"></i>상세 정보</h4>
+	        	<div class="form-group row filter">
+	               <div class="col-md-12 col-padding">
+	               	<label class="col-form-label label-block">
+	              	 <i class="icon fa-angle-double-right m-r-5 text-primary" aria-hidden="true"></i>이름 
+	                </label>
+	                <span v-text="name"></span>
+	               </div>
+	             </div>
+	             <div class="form-group row filter">
+	               <div class="col-md-12 col-padding">
+	               	<label class="col-form-label label-block">
+	              	 <i class="icon fa-angle-double-right m-r-5 text-primary" aria-hidden="true"></i>학교 
+	                </label>
+	                <span class="m-r-10" v-text="school">송촌고등학교</span><span v-if="school != '미입력'"><span v-text="grade"></span>학년</span>
+	               </div>
+	             </div>
+	             <div class="form-group row filter">
+	               <div class="col-md-12 col-padding">
+	               	<label class="col-form-label label-block">
+	              	 <i class="icon fa-angle-double-right m-r-5 text-primary" aria-hidden="true"></i>연도 
+	                </label>
+	                <input type="text" id="year" class="form-control form-control-inline" disabled="disabled">
+	               </div>
+	             </div>
+				 <div class="form-group row filter">
+	               <div class="col-md-12 col-padding">
+	               	<label class="col-form-label label-block">
+	              	 <i class="icon fa-angle-double-right m-r-5 text-primary" aria-hidden="true"></i>분류 
+	                </label>
+	                <select id="mode" name="mode" class="form-control form-control-inline" v-model="mode" style="width: 50%" disabled="disabled">
+						<option value="0">중등부 내신</option>
+						<option value="1" v-if="gradeCode == 3">고등부 내신</option>
+						<option value="2" v-if="gradeCode == 3">모의고사</option>
+					</select>
+	               </div>
+	             </div>
+	             <div class="form-group row filter">
+	               <div class="col-md-12 col-padding">
+	               	<label class="col-form-label label-block m-r-60"></label>
+					<select id="type" name="type" class="form-control form-control-inline" style="width: 50%" v-model="type" disabled="disabled">
+						<option v-for="item in typeList" v-bind:value="item.value" v-text="item.text"></option>
+					</select>
+	               </div>
+	             </div>
+				</div>
+			</div>
+			<div class="col-lg-5 filter-box" id="filterBox">
+				<div class="panel p-25 panel-marge score-height-auto f-s-12" style="height: 313.15px">
+					<h4 class="m-t-0"><i aria-hidden="true" class="icon fa-warning m-r-5 text-primary"></i>성적 입력시 주의 사항</h4>
+					<div class="m-b-5"><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i><span>상세 정보의 내용이 올바른지 확인해주세요.</span></div>
+					<div class="m-b-5"><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>점수는 소수점 둘째자리까지 허용됩니다.</div>
+					<div class="m-b-5"><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>1개 이상의 과목의 성적이 등록되어 있어야 합니다.</div>
+					<div class="m-b-5"><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>동일한 교과목을 중복하여 등록할 수 없습니다.</div>
+					<div class="m-b-5"><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>아래의 과목 순서는 자동 조정되어 성적 현황에 표시됩니다.</div>
+					<div class="m-b-5"><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i><span class="text-danger">당해년도의 모든 과목이 동일해야 등급현황을 파악할 수 있습니다.</span></div>
+				</div>
+			</div>
+			<div class="col-lg-12">
+				<div class="panel p-25 panel-marge score-height-auto mobile-p-b-10" style="height: 451px; min-height: fit-content;">
+					<h4 class="m-t-0"><i aria-hidden="true" class="icon fa-terminal m-r-5 text-primary"></i>점수 입력</h4>
+					
+					<div>
+						<table class="table table-hover toggle-circle" id="highMoiList"
+		                  data-paging="true" data-filtering="flase" data-sorting="false" data-paging-size="30">
+		                  <thead>
+		                    <tr>
+		                      <th data-name="name">과목</th>
+		                      <th data-name="score" data-breakpoints="xs sm md">원점수</th>
+		                      <th data-name="rating" data-breakpoints="xs sm md">등급</th>
+		                      <th data-name="status" class="text-center">편집</th>
+		                    </tr>
+		                  </thead>
+		                  <tbody>
+		                  	<tr v-for="item in highMoiOrigin">
+		                  		<td v-text="item.name"></td>
+		                  		<td v-text="item.score"></td>
+		                  		<td v-text="item.rating"></td>
+		                  		<td v-html="item.status"></td>
+		                  	</tr>
+		                  </tbody>
+		                </table>
+		                <div class="text-right">
+		                	<button type="button" class="btn btn-info m-r-5" v-on:click="openHighMoiModal()">과목추가</button>
+		                </div>
+		                
+					</div>
+				</div>
+				
+			</div>
+			<div class="col-lg-12">
+					<div class="panel p-25 m-b-0 p-b-60">
+						<div class="media">
+							<div class="pr-20">
+								<span class="avatar avatar-online">
+								<img width="60" height="60" alt="avatar" th:attr="avatar=${member.avatar}">
+								</span>
+							</div>
+							<div class="media-body">
+								<h5 class="list-group-item-heading mt-0 mb-5" th:text="${member.name}">
+								</h5>
+								<p class="list-group-item-text" v-text="today">
+								</p>
+							</div>
+						</div>
+						<div class="action-btn-location">
+							<button type="button" class="btn btn-primary m-r-5" v-on:click="okHighMoi()">수정</button>
+						</div>
+						
+					</div>
+				</div>
+		</div>
+	</div>
+
+	<!-- Modal -->
+	<div class="modal fade modal-primary" id="highMoiModal" aria-hidden="true" aria-labelledby="highMoiModal" role="dialog" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">×</span>
+					</button>
+					<h4 class="modal-title">과목 추가</h4>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+						<label for="name" class="form-control-label">과목</label>
+						<div>
+							<select id="subjectCode" class="modal fade" name="subjectCode" style="width:100%;">
+								<option></option>
+								<option v-for="item in subjectList" v-bind:value="item.idx" v-text="item.name"></option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="name" class="form-control-label">원점수</label>
+						<input type="text" id="highNesinScore" name="highMoiScore" placeholder="원점수를 입력해주세요." class="form-control" v-model="highMoiScore" onchange="highNesinScoreCheck(this)">
+					</div>
+					<div class="form-group">
+						<label for="name" class="form-control-label">등급</label>
+						<input type="text" id="highNesinRating" name="highMoiRating" placeholder="등급을 입력해주세요." class="form-control" v-model="highMoiRating" onchange="highNesinRatingCheck(this)">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" v-on:click="addHighMoi()">추가</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">취소</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End Modal -->
+	
+	<!-- Modal -->
+	<div class="modal fade modal-primary" id="highMoiUpdateModal" aria-hidden="true" aria-labelledby="highMoiUpdateModal" role="dialog" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">×</span>
+					</button>
+					<h4 class="modal-title">과목 성적 수정</h4>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+						<label for="name" class="form-control-label">과목</label>
+						<input type="text" id="highMoiUpdateSubjectName" name="highMoiUpdateSubjectName" class="form-control" disabled="disabled">
+					</div>
+					<div class="form-group">
+						<label for="name" class="form-control-label">원점수</label>
+						<input type="text" id="highMoiUpdateScore" name="highMoiUpdateScore" placeholder="원점수를 입력해주세요." class="form-control" v-model="highMoiUpdateScore" onchange="highNesinUpdateScoreCheck(this)">
+					</div>
+					<div class="form-group">
+						<label for="name" class="form-control-label">등급</label>
+						<input type="text" id="highMoiUpdateRating" name="highMoiUpdateRating" placeholder="등급을 입력해주세요." class="form-control" v-model="highMoiUpdateRating" onchange="highNesinUpdateRatingCheck(this)">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" v-on:click="updateHighMoi()">수정</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">취소</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End Modal -->
+
+</div>
+</th:block>
+
+<th:block layout:fragment="vuejs">
+	<script th:attr="src=@{'/js/vue/scoreUpdateMoiVue.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customScript">
+	<script th:attr="src=@{'/js/custom/score-update-moi.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customStyle">
+	<link rel="stylesheet" th:attr="href=@{'/css/custom/score.css?ver=' + ${@environment.getProperty('app.version')}}">
+</th:block>
+</html>

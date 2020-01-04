@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.components.score.data.MiddleNesinDao">
+	
+	
+	
+	<insert id="createOne" parameterType="MiddleNesinEntity">
+		INSERT
+		INTO MIDDLE_NESIN
+		VALUES(
+			#{scoreIdx},
+			#{subjectCode},
+			#{score},
+			#{average},
+			#{deviation},
+			#{applicants},
+			#{ranking}
+		)
+	</insert>
+	
+	<select id="read" resultType="com.app.components.score.param.MiddleNesinOutParam" parameterType="Integer">
+		SELECT
+			*
+		FROM
+			MIDDLE_NESIN LEFT JOIN SUBJECT
+		ON
+			MIDDLE_NESIN.SUBJECT_CODE = SUBJECT.IDX
+		WHERE
+			MIDDLE_NESIN.SCORE_IDX = #{param1}
+	</select>
+	
+	<update id="updateOne" parameterType="MiddleNesinEntity">
+		UPDATE
+			MIDDLE_NESIN
+		SET
+			SCORE = #{score},
+			AVERAGE = #{average},
+			DEVIATION = #{deviation},
+			APPLICANTS = #{applicants},
+			RANKING = #{ranking}
+		WHERE
+			SCORE_IDX = #{scoreIdx} AND
+			SUBJECT_CODE = #{subjectCode}
+	</update>
+	
+	
+
+</mapper>

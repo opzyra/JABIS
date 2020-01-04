@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" 
+xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{layout/app_layout.html}" 
+th:with="
+title='JABIS', 
+bodyClass='animsition page-project counse-main site-navbar-small',  
+menu='#menuStudent, #menuCounse'
+">
+
+<th:block layout:fragment="page">
+<input type="hidden" id="studentIdx" th:value="${studentIdx}">
+<div id="counseVue" class="page">
+
+	<div class="page-content container-fluid">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+					<div class="row">
+						<div class="col-lg-8 p-0">
+							<div class="panel-header">
+								<h3 class="m-t-0">상담 열람</h3> 
+								<div>
+									<i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>학생별 상담 일지 전체 내역 입니다.</div> <div>
+									<i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>검색 필터링에서 학생 선택 후 <i aria-hidden="true" class="icon fa-search text-primary"></i> 버튼을 클릭하여 상담 일지를 확인하세요.</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-4">
+							<ul class="panel-info">
+					            <li>
+					              <div class="num black-600" v-text="listCount"></div>
+					              <p class="link">상담 건수</p>
+					            </li>
+					          </ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-12" v-if="myStudents.length != 0">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+					<h4 class="m-t-0"><i aria-hidden="true" class="icon wb-users m-r-5 text-primary"></i>담당 학생</h4>
+					<div class="inline-block" v-for="item in myStudents">
+						<button type="button" class="btn btn-primary btn-icon btn-outline btn-round btn-xs p-5 m-5" v-on:click="myStudentCounse(item.idx)"><span v-text="item.name"></span><i aria-hidden="true" class="icon fa-search m-l-5"></i></button>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-8">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+					<h4 class="m-t-0"><i aria-hidden="true" class="icon fa-filter m-r-5 text-primary"></i>검색 필터링</h4>
+					<div class="form-group row filter">
+		               <div class="col-md-12 col-padding">
+		               	<label class="col-form-label label-block">
+		              	 <i class="icon fa-angle-double-right m-r-5 text-primary" aria-hidden="true"></i>학생 이름 
+		                </label>
+		                 <select id="name" name="name" class="form-control form-control-inline schools" v-model="studentIdx">
+							<option v-for="item in students" v-bind:value="item.idx" v-text="item.name"></option>
+						</select>
+		               </div>
+		             </div>
+		             <div class="form-group row filter">
+		               <div class="col-md-12 col-padding">
+		               	<label class="col-form-label label-block">
+		              	 <i class="icon fa-angle-double-right m-r-5 text-primary" aria-hidden="true"></i>기간 선택 
+		                </label>
+		                <div id="datepicker" class="input-daterange">
+		                      <div class="input-group">
+		                        <div class="input-group-prepend">
+		                          <span class="input-group-text">
+		                            <i class="icon wb-calendar" aria-hidden="true"></i>
+		                          </span>
+		                        </div>
+		                        <input id="start" type="text" class="form-control" name="start" placeholder="시작일"/>
+		                      </div>
+		                      <div class="input-group">
+		                        <div class="input-group-prepend">
+		                          <span class="input-group-text">~</span>
+		                        </div>
+		                        <input id="end" type="text" class="form-control" name="end" placeholder="마지막일"/>
+		                      </div>
+		                    </div>
+						<button type="button" class="btn btn-icon btn-primary" v-on:click="searchCounse()"><i class="icon wb-search" aria-hidden="true"></i></button>
+		               </div>
+		             </div>
+				</div>
+			</div>
+			<div class="col-lg-4">
+				<div class="panel p-25 panel-marge counse-menu" style="height: 177.24px">
+					<h4 class="m-t-0 filter-box"><i aria-hidden="true" class="icon wb-menu m-r-5 text-primary"></i>메뉴</h4>
+					<button sec:authorize="hasAnyAuthority('ROLE_WEB', 'ROLE_ADMIN', 'ROLE_MASTER', 'ROLE_TEAM', 'ROLE_HRT')" v-if="search == true" type="button" class="btn btn-icon btn-block btn-primary btn-outline" v-on:click="linkCreate()"><i aria-hidden="true" class="icon wb-pencil m-r-5"></i><span v-text="name"></span>의 상담일지 작성</button>
+				</div>
+			</div>
+			<div class="col-lg-12">
+				<div class="panel p-30 mobile-height-auto mobile-table m-b-0" style="height: 1380px;">
+					<div id="loadingBar" class="loading-bar">
+				      <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+				    </div>
+					<table class="table table-hover toggle-circle" id="counseList"
+	                  data-paging="true" data-filtering="flase" data-sorting="true" data-paging-size="30">
+	                  <thead>
+	                    <tr>
+	                      <th data-name="counseDate">일시</th>
+	                      <th data-name="mode">분류</th>
+	                      <th data-name="title" data-breakpoints="xs sm md">타이틀</th>
+	                      <th data-name="writeDate" data-breakpoints="xs sm md">작성일</th>
+	                      <th data-name="name" data-breakpoints="xs sm md">작성자</th>
+	                      <th data-name="more" class="text-center">상세보기</th>
+	                      <th data-name="modify" class="text-center" data-breakpoints="xs sm md">수정</th>
+	                    </tr>
+	                  </thead>
+	                </table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal -->
+    <div class="modal fade" id="modeZero" aria-hidden="true" aria-labelledby="exampleModalTabs"
+      role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-simple">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+            <h4 class="modal-title" id="exampleModalTabs"><span v-text="name"></span><span class="f-s-12 m-l-10" v-text="counse.counseDate"></span></h4>
+          </div>
+
+          <ul class="nav nav-tabs nav-tabs-line" role="tablist">
+            <li class="nav-item" role="presentation"><a class="nav-link active" data-toggle="tab" href="#exampleLine1"
+                aria-controls="exampleLine1" role="tab"><i aria-hidden="true" class="icon wb-user m-r-5"></i>학생</a></li>
+            <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#exampleLine2"
+                aria-controls="exampleLine2" role="tab"><i aria-hidden="true" class="icon wb-tag m-r-5"></i>학부모</a></li>
+          </ul>
+
+          <div class="modal-body">
+            <div class="tab-content">
+              <div class="tab-pane active" id="exampleLine1" role="tabpanel">
+                <div class="form-group">
+				   <label for="studentCounse" class="form-control-label text-primary"><i class="icon wb-paperclip m-r-5" aria-hidden="true"></i>장래 희망</label>
+				   <div v-text="counse.future"></div>
+                </div>
+                <div class="form-group">
+				   <label for="studentCounse" class="form-control-label text-primary"><i class="icon wb-paperclip m-r-5" aria-hidden="true"></i>공부 방법</label>
+				   <div v-html="counse.studyStyle"></div>
+                </div>
+                <div class="form-group">
+				   <label for="studentCounse" class="form-control-label text-primary"><i class="icon wb-paperclip m-r-5" aria-hidden="true"></i>학생 성향</label>
+				   <div v-html="counse.studentStyle"></div>
+                </div>
+              </div>
+
+              <div class="tab-pane" id="exampleLine2" role="tabpanel">
+                <div class="form-group">
+				   <label for="studentCounse" class="form-control-label text-primary"><i class="icon wb-paperclip m-r-5" aria-hidden="true"></i>학보무 성향</label>
+				   <div v-html="counse.parentStyle"></div>
+                </div>
+                <div class="form-group">
+				   <label for="studentCounse" class="form-control-label text-primary"><i class="icon wb-paperclip m-r-5" aria-hidden="true"></i>학보무 요청사항</label>
+				   <div v-html="counse.parentRequest"></div>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Modal -->
+	
+	<!-- Modal -->
+    <div class="modal fade" id="modeOne" aria-hidden="true" aria-labelledby="exampleModalTabs"
+      role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-simple">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+            <h4 class="modal-title" id="exampleModalTabs"><span v-text="name"></span><span class="f-s-12 m-l-10" v-text="counse.counseDate"></span></h4>
+          </div>
+
+          <ul class="nav nav-tabs nav-tabs-line" role="tablist">
+            <li class="nav-item" role="presentation"><a class="nav-link active" data-toggle="tab" href="#exampleLine3"
+                aria-controls="exampleLine1" role="tab"><i aria-hidden="true" class="icon wb-user m-r-5"></i>학생</a></li>
+            <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#exampleLine4"
+                aria-controls="exampleLine2" role="tab"><i aria-hidden="true" class="icon wb-tag m-r-5"></i>학부모</a></li>
+          </ul>
+
+          <div class="modal-body">
+            <div class="tab-content">
+              <div class="tab-pane active" id="exampleLine3" role="tabpanel">
+                <div class="form-group">
+				   <label for="studentCounse" class="form-control-label text-primary"><i class="icon wb-paperclip m-r-5" aria-hidden="true"></i>학생 상담 내용</label>
+				   <div v-html="counse.studentCounse"></div>
+                </div>
+              </div>
+
+              <div class="tab-pane" id="exampleLine4" role="tabpanel">
+                <div class="form-group">
+				   <label for="studentCounse" class="form-control-label text-primary"><i class="icon wb-paperclip m-r-5" aria-hidden="true"></i>학보무 상담 내용</label>
+				   <div v-html="counse.parentCounse"></div>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Modal -->
+	
+</div>
+
+</th:block>
+
+<th:block layout:fragment="vuejs">
+	<script th:attr="src=@{'/js/vue/counseVue.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customScript">
+	<script th:attr="src=@{'/js/custom/counse.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customStyle">
+	<link rel="stylesheet" th:attr="href=@{'/css/custom/counse.css?ver=' + ${@environment.getProperty('app.version')}}">
+</th:block>
+
+</html>

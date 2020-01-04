@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" 
+xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{layout/login_layout.html}" 
+th:with="
+title='JABIS', 
+bodyClass='animsition page-register-v2 layout-full page-dark'
+">
+
+<th:block layout:fragment="page">
+<div id="registerVue" class="page" data-animsition-in="fade-in" data-animsition-out="fade-out">
+	<div class="page-content">
+		<div class="page-brand-info">
+			<div class="brand">
+				<img class="brand-img" src="/images/logo@2x.png" alt="...">
+				<h2 class="brand-text font-size-40" th:text="${title}">Application</h2>
+			</div>
+			<p class="font-size-20">
+				A computerized system, process, or business is one in which the work is done by Network.
+			</p>
+		</div>
+		<div class="page-register-main animation-slide-left animation-duration-1">
+			<div class="brand hidden-md-up">
+				<img class="brand-img" src="/images/logo-colored@2x.png" alt="...">
+				<h3 class="brand-text font-size-40" th:text="${title}">Application</h3>
+			</div>
+			<h3 class="font-size-24">회원가입</h3>
+			<p>
+				제일학원 관계자만 이용할 수 있습니다.<br>
+				가입 후 인증절차가 필요합니다.
+			</p>
+			<form id="registerForm" method="post" autocomplete="off" role="form">
+				<div class="form-group">
+					<label class="sr-only" for="name">Full Name</label>
+					<input type="text" class="form-control" id="name" name="name" placeholder="이름" data-fv-field="name" v-model="name">
+				</div>
+				<div class="form-group">
+					<label class="sr-only" for="email">Email</label>
+					<input type="text" class="form-control" id="email" name="email" placeholder="이메일" data-fv-field="email" v-model="email">
+				</div>
+				<div class="form-group">
+					<label class="sr-only" for="password">Password</label>
+					<input type="password" class="form-control" id="password" name="password" placeholder="비밀번호" data-fv-field="password" v-model="password">
+				</div>
+				<div class="form-group">
+					<label class="sr-only" for="passwordCheck">Retype Password</label>
+					<input type="password" class="form-control" id="passwordCheck" name="passwordCheck" placeholder="비밀번호 확인" data-fv-field="passwordChecck">
+				</div>
+				<div class="form-group">
+					<label class="sr-only" for="phone">Phone</label>
+					<input type="text" class="form-control" id="phone" name="phone" placeholder="연락처" data-fv-field="phone" v-model="phone">
+				</div>
+				<div class="form-group clearfix">
+					<div class="checkbox-custom checkbox-inline checkbox-primary float-left">
+						<input type="checkbox" id="term" name="term" data-fv-field="term">
+						<label for="term"></label>
+					</div>
+					<p class="ml-40">
+						<a href="javascript:void(0);" v-on:click="term()">이용약관</a>에 동의합니다.
+					</p>
+				</div>
+				<button id="registerButton" type="submit" class="btn btn-primary btn-block">회원가입</button>
+			</form>
+			<p>
+				이미 계정이 있으신가요? <br>
+				<a href="/login/">로그인</a>
+			</p>
+			<footer class="page-copyright">
+			<p>
+				WEBSITE BY OPZYRA
+			</p>
+			<p>
+				© 2018. All RIGHT RESERVED.
+			</p>
+			<div class="social">
+				<a class="btn btn-icon btn-round social-twitter mx-5" href="javascript:void(0)">
+				<i class="icon fa-github" aria-hidden="true"></i>
+				</a>
+				<a class="btn btn-icon btn-round social-facebook mx-5" href="javascript:void(0)">
+				<i class="icon fa-linkedin" aria-hidden="true"></i>
+				</a>
+				<a class="btn btn-icon btn-round social-google-plus mx-5" href="javascript:void(0)">
+				<i class="icon fa-google-plus" aria-hidden="true"></i>
+				</a>
+			</div>
+			</footer>
+		</div>
+	</div>
+</div>
+</th:block>
+
+<th:block layout:fragment="vuejs">
+	<script th:attr="src=@{'/js/vue/registerVue.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customScript">
+	<script src="/vendor/jquery-placeholder/jquery.placeholder.js"></script>
+</th:block>
+
+<th:block layout:fragment="customStyle">
+	<link rel="stylesheet" th:attr="href=@{'/css/custom/register-v2.css?ver=' + ${@environment.getProperty('app.version')}}">
+</th:block>
+
+</html>

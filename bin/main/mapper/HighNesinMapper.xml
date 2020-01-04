@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.components.score.data.HighNesinDao">
+	
+	<insert id="createOne" parameterType="HighNesinEntity">
+		INSERT
+		INTO HIGH_NESIN
+		VALUES(
+			#{scoreIdx},
+			#{subjectCode},
+			#{score},
+			#{rating},
+			#{unit}
+		)
+	</insert>
+	
+	<select id="read" resultType="com.app.components.score.param.HighNesinOutParam" parameterType="Integer">
+		SELECT
+			*
+		FROM
+			HIGH_NESIN LEFT JOIN SUBJECT
+		ON
+			HIGH_NESIN.SUBJECT_CODE = SUBJECT.IDX
+		LEFT JOIN SCORE
+		ON
+			HIGH_NESIN.SCORE_IDX = SCORE.IDX
+		WHERE
+			HIGH_NESIN.SCORE_IDX = #{param1}
+		ORDER BY
+			SUBJECT.ORDER
+	</select>
+	
+	<delete id="deleteOne">
+		DELETE
+		FROM HIGH_NESIN
+		WHERE
+			SCORE_IDX = #{param1} AND
+			SUBJECT_CODE = #{param2}
+	</delete>
+	
+	<update id="updateOne" parameterType="HighNesinEntity">
+		UPDATE
+			HIGH_NESIN
+		SET
+			SCORE = #{score},
+			RATING = #{rating},
+			UNIT = #{unit}
+		WHERE
+			SCORE_IDX = #{scoreIdx} AND
+			SUBJECT_CODE = #{subjectCode}
+	</update>
+
+</mapper>

@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" 
+xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{layout/app_layout.html}" 
+th:with="
+title='JABIS', 
+bodyClass='animsition page-profile-v2 site-navbar-small',  
+menu='#menuStudent, #menuStudentList'
+">
+
+<th:block layout:fragment="page">
+<input type="hidden" id="studentIdx" th:value="${studentIdx}">
+<div id="studentOneVue" class="page bg-white">
+	<div class="page page-content">
+		<div class="row">
+			<div class="col-lg-3 col-xl-3">
+			
+	          <div class="user-info card card-shadow text-center">
+	          
+	          	<div v-if="student.status == 0" class="ribbon ribbon-bookmark ribbon-reverse ribbon-success">
+                  <span class="ribbon-inner">입학예정</span>
+                </div>
+	          
+	          	<div v-if="student.status == 1" class="ribbon ribbon-bookmark ribbon-reverse ribbon-primary">
+                  <span class="ribbon-inner">재원</span>
+                </div>
+                
+                <div v-if="student.status == 2" class="ribbon ribbon-bookmark ribbon-reverse ribbon-danger">
+                  <span class="ribbon-inner">결원</span>
+                </div>
+                
+                <div v-if="student.status == 3" class="ribbon ribbon-bookmark ribbon-reverse ribbon-warning">
+                  <span class="ribbon-inner">휴원</span>
+                </div>
+	          
+	            <div class="user-base card-block">
+	              <h2 class="user-name m-t-15" v-text="student.name"></h2>
+	              <p class="user-job">
+	              	<span v-if="student.school != '미입력'">
+	              		<span class="m-r-2" v-text="student.school"></span>
+	              		<span v-text="student.grade"></span>학년
+	              	</span>
+	              	<span v-else>
+	              		<span class="text-danger">학교 미입력</span>
+	              	</span>
+	              </p>
+	            </div>
+
+				<div class="user-socials list-group list-group-full" v-if="student.status != 0 && student.status != 3">
+	              <a class="text-primary">
+	                <i class="icon wb-calendar"></i> 최초등록일
+	              </a>
+	              <h4 class="m-0" v-text="student.regDate"></h4>
+	            </div>
+	            
+	            <div class="user-socials list-group list-group-full" v-if="student.status == 3">
+	              <a class="text-primary">
+	                <i class="icon wb-calendar"></i> 휴원일
+	              </a>
+	              <h4 class="m-0" v-text="student.leaveDate">-</h4>
+	            </div>
+	            
+	            <div class="user-socials list-group-full" v-if="student.status == 0" sec:authorize="hasAnyAuthority('ROLE_WEB', 'ROLE_ADMIN', 'ROLE_MASTER')">
+	              <button type="button" class="btn btn-outline btn-primary" v-on:click="updateStatusModal()">입학 처리</button>
+	            </div>
+	            
+	            <div class="user-socials list-group-full" v-if="student.status == 3" sec:authorize="hasAnyAuthority('ROLE_WEB', 'ROLE_ADMIN', 'ROLE_MASTER')">
+	              <button type="button" class="btn btn-outline btn-danger" v-on:click="deleteStudent()">정보 삭제</button>
+	            </div>
+
+	            <div class="user-stats m-b-0">
+	              <a class="user-stat counter">
+	                <span class="counter-number font-size-16">
+	                	<span v-if="student.classNomal == null" class="text-danger">미배정</span>
+	                	<span v-else v-on:click="studentList('classNomal')" v-text="student.classNomal" class="link"></span>
+	                </span>
+	              </a>
+	              <a class="user-stat counter p-15">
+	                <span class="counter-number font-size-16">
+	                	<span v-if="student.classTest == null" class="text-danger">미배정</span>
+	                	<span v-else v-on:click="studentList('classTest')" v-text="student.classTest" class="link"></span>
+	                </span>
+	              </a>
+	            </div>
+
+	          </div>
+	          
+	          <div class="user-friends card card-shadow" sec:authorize="hasAnyAuthority('ROLE_WEB', 'ROLE_ADMIN', 'ROLE_MASTER', 'ROLE_TEAM', 'ROLE_HRT')">
+	          	<div class="card-block">
+					<button type="button" class="btn btn-icon btn-block btn-primary btn-outline" v-on:click="updateStudent()"><i class="icon wb-edit m-r-5" aria-hidden="true"></i>학생 정보 수정</button>
+					<button v-if="isMobile == false"v-on:click="pdfStudent()" type="button" class="btn btn-icon btn-block btn-primary btn-outline"><i class="icon fa-file-pdf-o m-r-5" aria-hidden="true"></i>PDF 출력</button>
+	          	</div>
+	          </div>
+	          
+	          <div class="user-friends card card-shadow">
+	            <div class="card-block">
+	              <h4 class="card-title mb-20">기본 정보</h4>
+	              <ul class="list-group list-group-full m-0">
+	                <li class="list-group-item">
+	                  <div class="media">
+	                    <div class="media-body">
+		                    <div class="media-icon">
+		                    	<i class="icon fa-phone f-s-25 text-primary" aria-hidden="true"></i>
+		                    </div>
+	                    	
+		                    <div class="media-contents">
+		                    	<h5 class="mt-0 mb-5 hover">본인 연락처</h5>
+		                      	<small><a v-bind:href="telPhone(student.phone)" v-text="student.phone"></a></small>
+		                    </div>
+	                    </div>
+	                  </div>
+	                </li>
+	                <li class="list-group-item">
+	                  <div class="media">
+	                    <div class="media-body">
+		                    <div class="media-icon">
+		                    	<i class="icon fa-phone f-s-25 text-primary" aria-hidden="true"></i>
+		                    </div>
+	                    	
+		                    <div class="media-contents">
+		                    	<h5 class="mt-0 mb-5 hover">학부모 연락처</h5>
+		                      	<small><a v-bind:href="telPhone(student.parentPhone)" v-text="student.parentPhone"></a></small>
+		                    </div>
+	                    </div>
+	                  </div>
+	                </li>
+	                <li class="list-group-item">
+	                  <div class="media">
+	                    <div class="media-body">
+		                    <div class="media-icon">
+		                    	<i class="icon wb-map f-s-25 text-primary" aria-hidden="true"></i>
+		                    </div>
+	                    	
+		                    <div class="media-contents">
+		                    	<h5 class="mt-0 mb-5 hover">주소</h5>
+		                      	<small v-text="student.addressApi" class="m-r-3"></small>
+		                      	<small v-text="student.addressInput"></small>
+		                    </div>
+	                    </div>
+	                  </div>
+	                </li>
+	                <li class="list-group-item">
+	                  <div class="media">
+	                    <div class="media-body">
+		                    <div class="media-icon">
+		                    	<i class="icon wb-text f-s-25 text-primary" aria-hidden="true"></i>
+		                    </div>
+		                    <div class="media-contents">
+		                    	<h5 class="mt-0 mb-5 hover">담임</h5>
+		                      	<small v-text="student.hrtName" v-if="student.hrtName != null" v-on:click="studentList('hrt')" class="link"></small>
+		                      	<small v-else class="text-danger">미배정</small>
+		                    </div>
+	                    </div>
+	                  </div>
+	                </li>
+	                <li class="list-group-item">
+	                  <div class="media">
+	                    <div class="media-body">
+		                    <div class="media-icon">
+		                    	<i class="icon fa-car f-s-20 text-primary" aria-hidden="true"></i>
+		                    </div>
+		                    <div class="media-contents">
+		                    	<h5 class="mt-0 mb-5 hover">차량 탑승</h5>
+		                      	<small v-if="student.car == 0" class="text-success">탑승</small>
+		                      	<small v-else class="text-danger">미탑승</small>
+		                    </div>
+	                    </div>
+	                  </div>
+	                </li>
+	                <li class="list-group-item" v-if="student.recommend != null && student.recommend.length != 0">
+	                  <div class="media">
+	                    <div class="media-body">
+		                    <div class="media-icon">
+		                    	<i class="icon wb-user-circle f-s-25 text-primary" aria-hidden="true"></i>
+		                    </div>
+		                    <div class="media-contents">
+		                    	<h5 class="mt-0 mb-5 hover">지인 추천</h5>
+		                      	<small v-text="student.recommend"></small>
+		                    </div>
+	                    </div>
+	                  </div>
+	                </li>
+	              </ul>
+	            </div>
+	          </div>
+	          
+	          <!-- End User Info -->
+	          <div class="user-friends card card-shadow">
+	            <div class="card-block">
+	              <h4 class="card-title mb-20">학력</h4>
+	              <ul class="list-group list-group-full m-0">
+	                <li class="list-group-item" v-if="student.eschool != null && student.eschool != ''">
+	                  <div class="media">
+	                    <div class="media-body">
+		                    <div class="media-icon">
+		                    	<i class="icon fa-university f-s-25 text-primary" aria-hidden="true"></i>
+		                    </div>
+	                    	
+		                    <div class="media-contents">
+		                    	<h5 class="mt-0 mb-5 hover" v-text="student.eschool"></h5>
+		                      	<small v-if="student.gradeCode == 1">재학</small>
+		                      	<small v-else>졸업</small>
+		                    </div>
+	                    </div>
+	                  </div>
+	                </li>
+	                <li class="list-group-item" v-if="student.mschool != null && student.mschool != ''">
+	                  <div class="media">
+	                    <div class="media-body">
+		                    <div class="media-icon">
+		                    	<i class="icon fa-university f-s-25 text-primary" aria-hidden="true"></i>
+		                    </div>
+	                    	
+		                    <div class="media-contents">
+		                    	<h5 class="mt-0 mb-5 hover" v-text="student.mschool"></h5>
+		                      	<small v-if="student.gradeCode == 2">재학</small>
+		                      	<small v-else>졸업</small>
+		                    </div>
+	                    </div>
+	                  </div>
+	                </li>
+	                <li class="list-group-item" v-if="student.hschool != null && student.hschool != ''">
+	                  <div class="media">
+	                    <div class="media-body">
+		                    <div class="media-icon">
+		                    	<i class="icon fa-university f-s-25 text-primary" aria-hidden="true"></i>
+		                    </div>
+	                    	
+		                    <div class="media-contents">
+		                    	<h5 class="mt-0 mb-5 hover" v-text="student.hschool"></h5>
+		                      	<small v-if="student.gradeCode == 3">재학</small>
+		                      	<small v-else>졸업</small>
+		                    </div>
+	                    </div>
+	                  </div>
+	                </li>
+	                <li class="list-group-item" v-if="student.eschool == null && student.mschool == null && student.hschool == null">
+	                  <div>등록된 학력정보가 없습니다.</div>
+	                </li>
+	              </ul>
+	            </div>
+	          </div>
+	          <!-- End Friends List -->
+	          
+	          
+	          <!-- Friend List -->
+	          <div class="user-friends card card-shadow">
+	            <div class="card-block">
+	              <h4 class="card-title mb-20">형제 관계</h4>
+	              <ul class="list-group list-group-full m-0">
+		              <li class="list-group-item" v-for="item in student.sibling">
+		                  <div class="media">
+		                    <div class="media-body">
+			                    <div class="media-icon avatar">
+			                    	<img width="60" height="60" alt="avatar" v-bind:avatar="item.siblingRelation">
+			                    </div>
+			                    <div class="media-contents m-l-50">
+			                    	<h5 class="mt-0 mb-5 hover">
+				                    	<span v-text="item.siblingName"></span>
+				                    	<span class="sibling-help" v-text="item.siblingRelation"></span>
+			                    	</h5>
+			                    	<span v-if="item.siblingSchool != '미입력'">
+					              		<small class="m-r-2" v-text="item.siblingSchool"></small>
+					              		<small v-text="item.siblingGrade"></small><small>학년</small>
+					              	</span>
+					              	<span v-else>
+					              		<small class="text-danger">미입력</small>
+					              	</span>
+			                    </div>
+		                    </div>
+		                  </div>
+		                </li>
+		                <li class="list-group-item" v-if="student.sibling.length == 0">
+		                  <div>등록된 형제정보가 없습니다.</div>
+		                </li>
+	              </ul>
+	            </div>
+	          </div>
+	          <!-- End Friends List -->
+	        </div>
+	        
+	        <div class="col-lg-9 col-xl-9">
+	        	<div class="user-background card card-shadow">
+	              <div class="card-header card-header-transparent p-20">
+	                <h4 class="card-title mb-0">
+	                	입학 전 상담
+	                </h4>
+	              </div>
+				  <div v-if="lastCounse != null && lastCounse.idx != 0">
+		              <div class="card-block p-t-0">
+		              	<h5 class="card-title">
+		                  <i class="icon wb-calendar"></i>
+		                  <span v-text="lastCounse.counseDate"></span>
+		                </h5>
+		                <h5 class="card-title text-primary">
+		                  <i class="icon wb-paperclip"></i>
+		                  <span>장래희망</span>
+		                </h5>
+		                <p class="card-text" v-text="lastCounse.future"></p>
+		              </div>
+		              
+		               <div class="card-block">
+		                <h5 class="card-title text-primary">
+		                  <i class="icon wb-paperclip"></i>
+		                  <span>공부방법</span>
+		                </h5>
+		                <p class="card-text" v-html="lastCounse.studyStyle"></p>
+		              </div>
+		              
+		              <div class="card-block">
+		                <h5 class="card-title text-primary">
+		                  <i class="icon wb-paperclip"></i>
+		                  <span>학생 성향</span>
+		                </h5>
+		                <p class="card-text" v-html="lastCounse.studentStyle"></p>
+		              </div>
+		              
+		              <div class="card-block">
+		                <h5 class="card-title text-primary">
+		                  <i class="icon wb-paperclip"></i>
+		                  <span>학부모 성향</span>
+		                </h5>
+		                <p class="card-text" v-html="lastCounse.parentStyle"></p>
+		              </div>
+		              
+		              <div class="card-block">
+		                <h5 class="card-title text-primary">
+		                  <i class="icon wb-paperclip"></i>
+		                  <span>학부모 요청사항</span>
+		                </h5>
+		                <p class="card-text" v-html="lastCounse.parentRequest"></p>
+		              </div>
+				</div>
+				<div class="card-block" v-if="(lastCounse == null || lastCounse.idx == 0) && student.status <2">
+					입학 전 상담 내용이 없습니다.
+					<div class="m-t-10"><button type="button" class="btn btn-icon btn-outline btn-primary" v-on:click="counseWrite()"><i class="icon wb-pencil m-r-5"></i>작성</button></div>
+				</div>
+	            </div>
+	            <!-- End User Background -->
+	            
+	            <div class="user-recomendations card card-shadow">
+	              <div class="card-header card-header-transparent p-20">
+	                <div class="testimonial-control float-right">
+	                  <a class="testimonial-control-left m-r-5" data-slide="prev" href="#recomendations" role="button">
+	                    <span class="icon wb-chevron-left" aria-hidden="true"></span>
+	                    <span class="sr-only">Previous</span>
+	                  </a>
+	                  <a class="testimonial-control-right" data-slide="next" href="#recomendations" role="button">
+	                    <span class="icon wb-chevron-right" aria-hidden="true"></span>
+	                    <span class="sr-only">Next</span>
+	                  </a>
+	                </div>
+	                <h4 class="card-title mb-0">
+	                	최근 상담 일지
+	                	<span class="m-l-5 f-s-14 link" v-on:click="counseMore()"><i class="icon wb-search"></i></span>
+	                </h4>
+	              </div>
+	              <div class="card-block">
+	                <div class="testimonial carousel" role="listbox" id="recomendations" data-ride="carousel" data-interval="60000">
+	                  <ul class="testimonial-ul carousel-inner">
+	                    <li class="testimonial-item carousel-item" v-for="(item, index) in counse" v-bind:class="index == 0 ? 'active' : ''">
+	                      <h5 class="card-title">
+			                  <i class="icon wb-calendar"></i>
+			                  <span v-text="item.counseDate"></span>
+			              </h5>
+	                      <div class="card-block p-0 m-b-20">
+			                <h5 class="card-title text-primary">
+			                  <i class="icon wb-paperclip"></i>
+			                  <span>학생 상담</span>
+			                </h5>
+			                <p class="card-text" v-html="item.studentCounse"></p>
+			              </div>
+			              <div class="card-block p-0">
+			                <h5 class="card-title text-primary">
+			                  <i class="icon wb-paperclip"></i>
+			                  <span>학부모 상담</span>
+			                </h5>
+			                <p class="card-text" v-html="item.parentCounse"></p>
+			              </div>
+	                    </li>
+	                    <li class="testimonial-item carousel-item active" v-if="counse.length == 0">
+	                      	상담 내용이 없습니다.
+	                      	<div class="m-t-10" v-if="student.status < 1"><button type="button" class="btn btn-icon btn-outline btn-primary" v-on:click="counseWrite()"><i class="icon wb-pencil m-r-5"></i>작성</button></div>
+	                    </li>
+	                  </ul>
+	                </div>
+	              </div>
+	            </div>
+	            <!-- End User Recomendations -->
+	            <div class="user-background card card-shadow">
+	              <div class="panel nav-tabs-horizontal m-b-0" data-plugin="tabs">
+		              <div class="panel-heading">
+		                <h3 class="panel-title p-20">
+		                	성적 기록
+		                	<span class="m-l-5 f-s-14 link" v-on:click="scoreMore()"><i class="icon wb-search"></i></span>
+		                </h3>
+		              </div>
+		              <ul class="nav nav-tabs nav-tabs-line" role="tablist" id="scoreTab">
+		                <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#middleNesin"
+		                    aria-controls="middleNesin" role="tab" aria-expanded="true" v-on:click="getAllScore(0)">중등부 내신</a></li>
+		                <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#highNesin"
+		                    aria-controls="highNesin" role="tab" v-on:click="getAllScore(1)" v-if="student.gradeCode > 2">고등부 내신</a></li>
+		                <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#highMoi" aria-controls="highMoi"
+		                    role="tab" v-on:click="getAllScore(2)" v-if="student.gradeCode > 2"></i>모의고사</a></li>
+		              </ul>
+		              <div class="panel-body p-0">
+		                <div class="tab-content">
+		                  <div class="tab-pane active" id="middleNesin" role="tabpanel">
+		                    <div v-show="mNesinNoData == false" class="p-20">
+		                    	<div id="allScoreChart" class="chart-size"></div>
+        						<div id="allSubjectChart" class="chart-size"></div>
+		                    </div>
+		                    <div v-show="mNesinNoData == true" class="p-20">
+		                    	데이터가 없습니다.
+		                    	<div class="m-t-10" v-if="student.status <2"><button type="button" class="btn btn-icon btn-outline btn-primary" v-on:click="scoreWrite()"><i class="icon wb-pencil m-r-5"></i>작성</button></div>
+		                    </div>
+		                  </div>
+		                  <div class="tab-pane" id="highNesin" role="tabpanel">
+		                    <div v-show="hNesinNoData == false" class="p-20">
+		                    	<div id="allRatingChart" class="chart-size"></div>
+		                    </div>
+		                    <div v-show="hNesinNoData == true" class="p-20">
+		                    	데이터가 없습니다.
+		                    	<div class="m-t-10" v-if="student.status <2"><button type="button" class="btn btn-icon btn-outline btn-primary" v-on:click="scoreWrite()"><i class="icon wb-pencil m-r-5"></i>작성</button></div>
+		                    </div>
+		                  </div>
+		                  <div class="tab-pane" id="highMoi" role="tabpanel">
+		                    <div v-show="hMoiNoData == false" class="p-20">
+		                    	<div v-show="chartShow > 1" id="highMoiChart0" class="chart-size"></div>
+					        	<div v-show="chartShow > 0" id="highMoiChart1" class="chart-size"></div>
+					        	<div v-show="chartShow > -1" id="highMoiChart2" class="chart-size"></div>
+		                    </div>
+		                    <div v-show="hMoiNoData == true" class="p-20">
+		                    	데이터가 없습니다.
+		                    	<div class="m-t-10" v-if="student.status <2"><button type="button" class="btn btn-icon btn-outline btn-primary" v-on:click="scoreWrite()"><i class="icon wb-pencil m-r-5"></i>작성</button></div>
+		                    </div>
+		                  </div>
+		                </div>
+		              </div>
+		            </div>
+	             </div>
+	        </div>
+	        
+		</div>
+		
+	</div>
+	
+	<!-- Modal -->
+	<div class="modal fade modal-primary" id="statusModal" aria-hidden="true" aria-labelledby="statusModal" role="dialog" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">×</span>
+					</button>
+					<h4 class="modal-title">입학 처리</h4>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+						<label for="datepicker" class="form-control-label">최초 등록일</label>
+						<input type="text" class="form-control" id="datepicker">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" v-on:click="updateStatusProcess()">처리</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">취소</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End Modal -->
+	
+</div>
+
+</th:block>
+
+<th:block layout:fragment="vuejs">
+	<script th:attr="src=@{'/js/vue/studentOneVue.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customScript">
+	<script th:attr="src=@{'/js/custom/studentOne.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customStyle">
+	<link rel="stylesheet" th:attr="href=@{'/css/custom/profile-v2.css?ver=' + ${@environment.getProperty('app.version')}}">
+</th:block>
+
+</html>

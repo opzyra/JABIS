@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<meta charset="utf-8">
+<th:block th:fragment="scriptFragment" layout:fragment="script">
+	<!-- Core  -->
+    <script src="/vendor/babel-external-helpers/babel-external-helpers.js"></script>
+    <script src="/vendor/jquery/jquery.js"></script>
+    <script src="/vendor/popper-js/umd/popper.min.js"></script>
+    <script src="/vendor/bootstrap/bootstrap.js"></script>
+    <script src="/vendor/animsition/animsition.js"></script>
+    <script src="/vendor/mousewheel/jquery.mousewheel.js"></script>
+    <script src="/vendor/asscrollbar/jquery-asScrollbar.js"></script>
+    <script src="/vendor/asscrollable/jquery-asScrollable.js"></script>
+    
+    
+    <!-- Plugins -->
+    <script src="/vendor/switchery/switchery.js"></script>
+    <script src="/vendor/intro-js/intro.js"></script>
+    <script src="/vendor/screenfull/screenfull.js"></script>
+    <script src="/vendor/slidepanel/jquery-slidePanel.js"></script>
+    
+    <!-- Scripts -->
+    <script src="/js/common/Component.js"></script>
+    <script src="/js/common/Plugin.js"></script>
+    <script src="/js/common/Base.js"></script>
+    <script src="/js/common/Config.js"></script>
+    
+    <script src="/js/common/Section/Menubar.js"></script>
+    <script src="/js/common/Section/Sidebar.js"></script>
+    <script src="/js/common/Section/PageAside.js"></script>
+    <script src="/js/common/Plugin/menu.js"></script>
+    <script src="/js/common/Plugin/bootstrap-maxlength.js"></script>
+    <script src="/js/common/Plugin/asspinner.js"></script>
+	
+    <!-- Config -->
+    <script src="/js/common/config/colors.js"></script>
+    <script src="/js/common/config/tour.js"></script>
+    <script>Config.set('assets', '/assets');</script>
+    
+    <!-- VueJS -->
+    <script src="/vendor/polyfill/polyfill.min.js"></script>
+    <script src="/vendor/vue/vue.js"></script>
+    <script src="/vendor/axios/axios.min.js"></script>
+    <script src="/js/custom/axios.default.js"></script>
+    
+    <!-- Page -->
+    <script src="/js/common/Site.js"></script>
+    <script src="/js/common/Plugin/asscrollable.js"></script>
+    <script src="/js/common/Plugin/slidepanel.js"></script>
+    <script src="/js/common/Plugin/switchery.js"></script>
+	<script src="/js/common/Plugin/multi-select.js"></script>
+
+    <script src="/vendor/formvalidation/formValidation.min.js"></script>
+    <script src="/vendor/formvalidation/framework/bootstrap4.min.js"></script>
+    
+    <script src="/vendor/sweetalert/sweetalert.min.js"></script>
+    
+   	<script src="/vendor/twbs-pagination/jquery.twbsPagination.min.js"></script>
+	<script src="/vendor/twbs-pagination/jquery.simplePagination.js"></script>
+	<script src="/vendor/bootstrap-select/bootstrap-select.js"></script>
+	<script src="/js/common/Plugin/bootstrap-select.js"></script>
+	<script src="/vendor/bootstrap-table/bootstrap-table.min.js"></script>
+    <script src="/vendor/bootstrap-table/extensions/mobile/bootstrap-table-mobile.js"></script>
+    <script src="/vendor/bootstrap-table/locale/bootstrap-table-ko-KR.min.js"></script>
+	<script src="/vendor/toolbar/jquery.toolbar.js"></script>
+	<script src="/vendor/select2/select2.js"></script>
+	<script src="/vendor/multi-select/jquery.multi-select.js"></script>
+	<script src="/vendor/avatars/avatars.js"></script>
+	<script src="/vendor/jquery-quicksearch/jquery.quicksearch.js"></script>
+	<script src="/vendor/bootstrap-datepicker/bootstrap-datepicker.js"></script>
+	<script src="/vendor/bootstrap-datepicker/bootstrap-datepicker.ko.min.js" charset="UTF-8"></script>
+	<script src="/vendor/bootstrap-maxlength/bootstrap-maxlength.js"></script>
+	<script src="/vendor/print-this/printThis.js"></script>
+	<script src="/vendor/asspinner/jquery-asSpinner.min.js"></script>
+	<script src="/vendor/inputmask/inputmask.js"></script>
+	<script src="/vendor/inputmask/jquery.inputmask.js"></script>
+	<script src="/vendor/echarts/echarts.min.js"></script>
+	<script src="/vendor/pdf/bluebird.min.js"></script>
+	<script src="/vendor/pdf/html2canvas.min.js"></script>
+	<script src="/vendor/pdf/jspdf.min.js"></script>
+	<script src="/vendor/easy-autocomplete/jquery.easy-autocomplete.js"></script>
+	<script src="/vendor/aspieprogress/jquery-asPieProgress.js"></script>
+	<script src="/vendor/table-dragger/table-dragger.min.js"></script>
+	<script src="/vendor/jquery-timeago/jquery.timeago.js"></script>
+	<script src="/vendor/jquery-timeago/jquery.timeago.ko.js"></script>
+	<script src="/vendor/footable-bootstrap/js/footable.min.js"></script>
+	<script src="/vendor/nprogress/nprogress.js"></script>
+	<script src="/vendor/autocomplete/autocomplete.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+	
+	<script th:attr="src=@{'/js/custom/common-custom.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+	<!-- Custom VueJS -->
+	<script th:attr="src=@{'/js/vue/navVue.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+	<script th:attr="src=@{'/js/vue/passwordVue.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+    <th:block layout:fragment="vuejs"></th:block>
+
+    <!-- Custom Javascript -->
+    <script th:attr="src=@{'/js/custom/validation.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+    <th:block layout:fragment="customScript"></th:block>
+    <script th:inline="javascript">
+ 	(function(document, window, $){
+     'use strict';
+     var Site = window.Site;
+     $(document).ready(function(){
+       Site.run();
+     });
+   	})(document, window, jQuery);
+ 	jQuery(document).ready(function() {
+ 		  jQuery("time.timeago").timeago();
+ 		  setTimeout(function() { $(".loading-bar").css('display', 'none'); }, 2000)
+	});
+ 	$([[${menu}]]).addClass('active').addClass('open');
+   	</script>
+   	
+    
+</th:block>
+</html>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.components.work.data.WorkDao">
+	
+	<select id="readWorkCounse" resultType="WorkCounseDto" parameterType="com.app.components.work.param.WorkCounseInParam">
+		SELECT
+			STUDENT.IDX,
+			STUDENT.NAME,
+			STUDENT.SCHOOL,
+			STUDENT.GRADE,
+			IF(COUNSE.STUDENT_IDX IS NULL, false, true) AS WRITE_OK,
+			COUNSE.IDX AS COUNSE_IDX,
+			COUNSE.COUNSE_DATE
+		FROM
+			(SELECT IDX,NAME,SCHOOL,GRADE FROM STUDENT WHERE STUDENT.HRT_EMAIL = #{email} AND
+			STUDENT.STATUS = 1) AS STUDENT LEFT OUTER JOIN (SELECT STUDENT_IDX, IDX, COUNSE_DATE FROM COUNSE WHERE WRITE_DATE = #{counseDate}) AS COUNSE
+		ON
+			STUDENT.IDX = COUNSE.STUDENT_IDX
+		GROUP BY
+			STUDENT.IDX, STUDENT.NAME
+	</select>
+	
+	<select id="readWorkCounseMonth" resultType="WorkCounseDto" parameterType="com.app.components.work.param.WorkCounseMonthInParam">
+	<![CDATA[
+		SELECT
+			STUDENT.IDX,
+			STUDENT.NAME,
+			STUDENT.SCHOOL,
+			STUDENT.GRADE,
+			IF(COUNSE.STUDENT_IDX IS NULL, false, true) AS WRITE_OK,
+			COUNSE.IDX AS COUNSE_IDX,
+			COUNSE.COUNSE_DATE,
+			COUNSE.WRITE_DATE
+		FROM
+			(SELECT IDX,NAME,SCHOOL,GRADE FROM STUDENT WHERE STUDENT.HRT_EMAIL = #{email} AND
+			STUDENT.STATUS = 1) AS STUDENT LEFT OUTER JOIN (SELECT STUDENT_IDX, IDX, COUNSE_DATE, WRITE_DATE FROM COUNSE WHERE WRITE_DATE >= #{start} AND WRITE_DATE <= #{end} AND COUNSE_DATE >= #{start} AND COUNSE_DATE <= #{end}) AS COUNSE
+		ON
+			STUDENT.IDX = COUNSE.STUDENT_IDX
+		GROUP BY
+			STUDENT.IDX, STUDENT.NAME
+	]]>
+	</select>
+	
+	<select id="readWorkMain" resultType="WorkMainDto" parameterType="com.app.components.work.param.WorkInParam">
+		SELECT
+			NAME,
+			ROLE_CODE,
+			AVATAR,
+			(SELECT COUNT(1) FROM STUDENT WHERE HRT_EMAIL = #{email}) AS HRT_COUNT,
+			(SELECT COUNT(1) FROM COUNSE WHERE WRITE_EMAIL = #{email}) AS COUNSE_COUNT,
+			(SELECT COUNT(1) FROM STUDENT WHERE WRITER_EMAIL = #{email}) AS STUDENT_COUNT
+		FROM
+			MEMBER
+		WHERE
+			EMAIL = #{email}
+	</select>
+	
+</mapper>

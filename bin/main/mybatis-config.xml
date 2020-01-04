@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+	<settings>
+		<!-- 자동으로 카멜케이스 규칙으로 변환 -->
+		<setting name="mapUnderscoreToCamelCase" value="true"/>
+	</settings> 
+ 	<typeAliases>
+ 		<!-- data 패키지 등록 -->
+    	<package name="com.app.components.board.data"/>
+    	<package name="com.app.components.member.data"/>
+    	<package name="com.app.components.comments.data"/>
+    	<package name="com.app.components.student.data"/>
+    	<package name="com.app.components.sibling.data"/>
+    	<package name="com.app.components.hrt.data"/>
+    	<package name="com.app.components.classlist.data"/>
+    	<package name="com.app.components.counse.data"/>
+    	<package name="com.app.components.subject.data"/>
+    	<package name="com.app.components.score.data"/>
+    	<package name="com.app.components.data.data"/>
+    	<package name="com.app.components.work.data"/>
+    	<package name="com.app.components.dashboard.data"/>
+    	<package name="com.app.components.notification.data"/>
+	</typeAliases>
+
+	
+</configuration> 

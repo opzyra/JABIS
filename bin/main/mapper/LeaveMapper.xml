@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.components.data.data.LeaveDao">
+	
+	<resultMap type="LeaveResultMap" id="LeaveResultMap">
+		<result property="hrtName" column="HRT_NAME"/>
+		<result property="roleCode" column="ROLE_CODE"/>
+		<result property="hrtCount" column="HRT_COUNT"/>
+		<collection property="list" javaType="ArrayList" ofType="com.app.components.data.data.LeaveListDto" resultMap="map"/>
+	</resultMap>
+
+	<resultMap type="com.app.components.data.data.LeaveListDto" id="map">
+		<id property="studentIdx" column="STUDENT_IDX"/>
+		<result property="studentName" column="STUDENT_NAME"/>
+		<result property="leaveDate" column="LEAVE_DATE"/>
+		<result property="changedDate" column="CHANGED_DATE"/>
+	</resultMap>
+	
+	<insert id="createOne" parameterType="LeaveEntity">
+		INSERT 
+		INTO STUDENT_LEAVE(
+			STUDENT_IDX,
+			HRT_EMAIL,
+			LEAVE_DATE,
+			STATUS
+		) 
+		VALUES(
+			#{studentIdx},
+			#{hrtEmail},
+			now(),
+			0
+		)
+		ON DUPLICATE KEY UPDATE LEAVE_DATE = now(), CHANGED_DATE = NULL, STATUS = 0
+	</insert>
+	
+	<update id="updateOne" parameterType="LeaveEntity">
+		UPDATE
+			STUDENT_LEAVE
+		SET
+			CHANGED_DATE = NOW(),
+			STATUS = #{status}
+		WHERE
+			STUDENT_IDX = #{studentIdx}
+	</update>
+
+	<select id="readAll" resultMap="LeaveResultMap" parameterType="com.app.components.data.param.TeacherReadInParam">
+	<![CDATA[
+		SELECT 
+			MEMBER.NAME AS HRT_NAME,
+			MEMBER.ROLE_CODE, 
+			IFNULL((SELECT STUDENT_COUNT FROM COUNSE_MONTH WHERE EMAIL = MEMBER.EMAIL AND YEAR = YEAR(#{end}) AND MONTH = MONTH(#{end})), (SELECT COUNT(1) FROM STUDENT WHERE HRT_EMAIL = MEMBER.EMAIL)) AS HRT_COUNT,
+			STUDENT.IDX AS STUDENT_IDX,
+			STUDENT.NAME AS STUDENT_NAME, 
+			LEAVE_DATE, 
+			CHANGED_DATE
+		FROM MEMBER
+			LEFT JOIN (SELECT * FROM STUDENT_LEAVE WHERE LEAVE_DATE >= #{start} AND LEAVE_DATE <= #{end} AND STUDENT_LEAVE.STATUS = 0) AS STUDENT_LEAVE
+		ON STUDENT_LEAVE.HRT_EMAIL = MEMBER.EMAIL
+			LEFT JOIN STUDENT
+		ON STUDENT_LEAVE.STUDENT_IDX = STUDENT.IDX
+		WHERE MEMBER.DELETE_STATUS = 0 AND MEMBER.ENABLED_CODE = 0 AND MEMBER.ROLE_CODE > 0 AND MEMBER.ROLE_CODE < 5
+		ORDER BY
+			HRT_NAME
+	]]>
+	</select>
+
+
+</mapper>

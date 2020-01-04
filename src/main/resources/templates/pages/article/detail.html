@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" 
+xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{layout/app_layout.html}" 
+th:with="
+title='JABIS', 
+bodyClass='animsition page-project site-navbar-small',
+menu='#menuNotice'  
+">
+
+<th:block layout:fragment="page">
+
+<input id="writer" type="hidden" th:value="${board.email}">
+
+<div id="articleDetailVue" class="page">
+	
+	<div class="page-content container-fluid">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+					<div class="row">
+						<div class="col-lg-8">
+							<div class="panel-header">
+								<h3 class="m-t-0">공지사항</h3> 
+								<div><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>학원 및 시스템에 관련된 공지사항 입니다.</div> 
+								<div><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>공지사항을 수시로 확인해 주세요.</div>
+							</div>	
+						</div>
+						<div class="col-lg-4 panel-header-help" v-if="checkWriter()">
+							<button type="button" class="btn btn-info" v-if="checkRealWriter()" v-on:click="modifyArticle()">수정</button>
+							<button type="button" class="btn btn-danger" v-if="checkRealWriter()" v-on:click="deleteArticle()">삭제</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="col-lg-8">
+				<div class="panel p-25 panel-marge mobile-p-b-0" style="height: 126px">
+					<h4 class="m-t-0"><i aria-hidden="true" class="icon fa-paperclip m-r-5 text-primary"></i>제목</h4>
+					<h5 class="card-title project-title" th:text="${board.title}"></h5>
+					<span class="m-r-10"><i class="icon fa-bolt m-r-5"></i>열람 <span th:text="${board.viewCount}"></span></span>
+					<span class="m-r-10"><i class="icon fa-comments-o m-r-5"></i>댓글 <span th:text="${board.commentsCount}"></span></span>
+				</div>
+			</div>
+			
+			<div class="col-lg-4">
+				<div class="panel p-25 panel-marge mobile-p-b-10">
+					<h4 class="m-t-0"><i aria-hidden="true" class="icon fa-user-circle m-r-5 text-primary"></i>작성자</h4>
+					<div class="media">
+						<div class="pr-20">
+							<span class="avatar avatar-online">
+							<img width="60" height="60" alt="avatar" th:attr="avatar=${board.avatar}">
+							<input type="hidden" th:value="${board.email}">
+							</span>
+						</div>
+						<div class="media-body">
+							<h5 class="list-group-item-heading mt-0 mb-5" th:text="${board.name}">
+							</h5>
+							<span class="list-group-item-text m-r-10">
+								<i class="icon fa-clock-o m-r-5"></i>
+								<span th:text="${#dates.format(board.writeDate, 'yy.MM.dd HH:mm:ss')}"></span>
+							</span>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="col-lg-12">
+				<div class="panel p-25 panel-marge mobile-p-b-10">
+					<h4 class="m-t-0"><i aria-hidden="true" class="icon fa-file-text-o m-r-5 text-primary"></i>내용</h4>
+					<div class="card-text contents" th:utext="${board.contents}"></div>
+				</div>
+			</div>
+			
+			<div class="col-lg-12">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+					<h4 class="m-t-0"><i aria-hidden="true" class="icon fa-comments-o m-r-5 text-primary"></i>댓글</h4>
+					<div class="comments">
+					
+						<div class="comment media list-animate" v-for="item in comments" v-model="comments">
+							<div class="pr-15">
+								<a href="#" class="avatar avatar-sm">
+								<img v-bind:avatar="item.avatar" alt="avatar">
+								</a>
+							</div>
+							<div class="comment-body media-body">
+								<div class="comment-title">
+									<div class="comment-meta float-right">
+										<span v-text="item.writeDate"></span>
+									</div>
+									<a href="javascript:void(0)" class="comment-author" v-text="item.name">
+									</a>
+									<button type="button" class="btn btn-pure btn-default icon wb-pencil p-0 btn-edit" v-if="checkEmail(item.email)" onclick="modifyComments(this)">
+									</button>
+									<button type="button" class="btn btn-pure btn-default icon wb-trash p-0 btn-trash" v-if="checkRole(item.email)" v-bind:data-idx="item.idx" v-bind:data-boardIdx="boardIdx" onclick="deleteComments(this)">
+									</button>
+								</div>
+								<div class="comment-content">
+									<div class="comments-view" v-html="item.contents"></div>
+									<div class="comments-modify" style="display:none;">
+					                  <div class="form-group">
+					                    <textarea name="contents" class="form-control comments-modify-text" rows="5" placeholder="댓글 수정" style="resize: none;"></textarea>
+					                  </div>
+					                  <div class="form-group">
+					                    <button type="button" class="btn btn-primary m-r-5" onclick="modifyAction(this)" v-bind:data-idx="item.idx">수정</button>
+					                    <button type="button" class="btn btn-default" onclick="cancleModify()">취소</button>
+					                  </div>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<div class="comments" v-if="comments.length == 0">
+							<p class="m-t-10">등록된 댓글이 없습니다.</p>
+						</div>
+
+					</div>
+					
+					<div class="comments-add media mt-25" v-show="comments.length != 0">
+						<ul id="pagination" class="pagination pagination-sm pagination-gap"></ul>
+					</div>
+					
+					<div class="comments-add media mt-25">
+						<div class="pr-20">
+							<a class="avatar avatar-sm" href="javascript:void(0)">
+							<img width="60" height="60" alt="avatar" th:attr="avatar=${member.avatar}">
+							</a>
+						</div>
+						<div class="media-body">
+								<form method="post" id="commentsForm">
+				                  <div class="form-group">
+				                    <textarea id="commentsContent" name="contents" class="form-control" rows="5" placeholder="댓글 쓰기" style="resize: none;"></textarea>
+				                  </div>
+				                  <div class="form-group text-right">
+				                    <button id="commentsButton" type="submit" class="btn btn-primary m-r-5">작성</button>
+				                  </div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+</div>
+
+</th:block>
+
+<th:block layout:fragment="vuejs">
+	<script th:attr="src=@{'/js/vue/articleDetailVue.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customScript">
+	<script th:attr="src=@{'/vendor/summernote/summernote.min.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+	<script th:attr="src=@{'/vendor/summernote/summernote-ko-KR.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+	<script th:attr="src=@{'/js/common/Plugin/summernote.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+	<script th:attr="src=@{'/js/custom/editor-summernote.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+	<script th:attr="src=@{'/js/custom/comments.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+	<script th:attr="src=@{'/js/custom/article-detail.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customStyle">
+	<link rel="stylesheet" th:attr="href=@{'/css/custom/project.css?ver=' + ${@environment.getProperty('app.version')}}">
+</th:block>
+
+</html>

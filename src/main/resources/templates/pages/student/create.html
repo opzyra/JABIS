@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" 
+xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{layout/app_layout.html}" 
+th:with="
+title='JABIS', 
+bodyClass='animsition page-project student-edit site-navbar-small', 
+menu='#menuStudent, #menuStudentList'
+">
+<th:block layout:fragment="page">
+<div id="studentCreateVue" class="page">
+	<form id="studentCreateForm">
+	<div class="page-content container-fluid">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+					<div class="">
+						<h3 class="m-t-0">새 학생 등록</h3>
+						<div><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>학생을 새롭게 등록합니다.</div> 
+						<div><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>학생 등록을 완료하면 최초 상담일지를 작성할 수 있습니다.</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-8">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+					<h4 class="m-t-0"><i aria-hidden="true" class="icon fa-user-circle m-r-5 text-primary"></i>기본 정보</h4>
+					<div class="row">
+						<div class="col-lg-8">
+							<div class="form-group">
+								<label for="name" class="form-control-label">이름</label>
+								<input type="text" id="name" name="name" placeholder="이름을 입력해주세요." class="form-control" maxlength="20" v-model="name">
+							</div>
+						</div>
+						<div class="col-lg-4">
+							<div class="form-group">
+								<label class="form-control-label">성별</label>
+								<div>
+									<div class="radio-custom radio-default radio-inline">
+										<input type="radio" id="genderMale" name="gender" checked="" value="0" v-model="gender">
+										<label for="genderMale">남성</label>
+									</div>
+									<div class="radio-custom radio-default radio-inline">
+										<input type="radio" id="genderFemale" name="gender" value="1" v-model="gender">
+										<label for="genderFemale">여성</label>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-lg-6">
+							<div class="form-group">
+								<label class="form-control-label">본인 연락처</label>
+								<div class="input-group">
+									<input id="phone" name="phone" type="text" class="form-control" placeholder="연락처를 입력해주세요." maxlength="13" v-model="phone">
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-6">
+							<div class="form-group">
+								<label class="form-control-label">학부모 연락처</label>
+								<div class="input-group">
+									<input id="parentPhone" name="parentPhone" type="text" class="form-control" placeholder="연락처를 입력해주세요." maxlength="13" v-model="parentPhone">
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-lg-6">
+							<label for="name" class="form-control-label">주소</label>
+							<div class="form-group">
+								<div class="input-group">
+									<input id="zoneCode" name="zoneCode" type="text" class="form-control" disabled="disabled" placeholder="" v-model="zoneCode">
+									<span class="input-group-btn">
+									<button type="button" class="btn btn-primary" onclick="sample3_execDaumPostcode()">우편번호 찾기</button>
+									</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-12">
+							<div class="form-group">
+								<label class="form-control-label">기본 주소</label>
+								<div class="input-group">
+									<input type="text" id="addressApi" name="addressApi" class=" form-control d_form large address" placeholder="" disabled="disabled" v-model="addressApi">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="form-control-label">상세 주소</label>
+								<div class="input-group">
+									<input type="text" id="addressInput" name="addressInput" class="form-control address" placeholder="상세주소를 입력해주세요." maxlength="50" v-model="addressInput">
+								</div>
+							</div>
+							<div class="form-group">
+								<div id="wrap" style="display:none;border:1px solid;width:100%x;height:300px;margin:5px 0;position:relative" scrolling="no">
+									<img src="//t1.daumcdn.net/localimg/localimages/07/postcode/320/close.png" id="btnFoldWrap" style="cursor:pointer;position:absolute;right:0px;top:-1px;z-index:1" onclick="foldDaumPostcode()" alt="접기 버튼">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-4 panel-marge mobile-p-b-0">
+				<div class="panel p-25">
+					<h4 class="m-t-0"><i aria-hidden="true" class="icon fa-university m-r-5 text-primary"></i>학력 정보</h4>
+					<div class="m-b-6"><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>최종학력이 현재 학력입니다.</div>
+					<div class="form-group">
+						<div class="input-group">
+							<input type="text" class="form-control" name="" placeholder="학교를 검색해주세요." v-model="schoolSearchQuery" v-on:keyup.enter="schoolSearch">
+							<span class="input-group-btn">
+							<button type="button" class="btn btn-primary" v-on:click="schoolSearch"><i class="icon wb-search" aria-hidden="true"></i></button>
+							</span>
+						</div>
+						<div id="searchResult" style="display:none;">
+							<ul class="list-group list-group-full">
+								<li class="list-group-item list-group-item-action p-10 school-name" v-for="item in schoolList" v-on:click="schoolSelect(item)">
+								<span class="badge badge-pill badge-danger" v-if="item.type==='04'">고등</span>
+								<span class="badge badge-pill badge-info" v-if="item.type==='03'">중등</span>
+								<span class="badge badge-pill badge-success" v-if="item.type==='02'">초등</span>
+								<span class="badge badge-pill badge-warning" v-text="item.location"></span>
+								<span class="m-b-5" v-text="item.name"></span>
+								</li>
+								<li id="schoolNotResult" class="list-group-item list-group-item-action p-10" style="display:none;">
+								<span class="text-center">검색 결과가 없습니다.</span>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="form-control-label">초등학교</label>
+						<div class="input-group">
+							<input id="eSchool" name="eSchool" type="text" class="form-control" disabled="disabled" placeholder="검색을 통해 선택해주세요." v-bind:value="elSchool">
+							<span class="input-group-btn">
+							<button type="button" class="btn btn-default btn-outline" v-on:click="schoolReset('02')"><i class="icon wb-trash"></i></button>
+							</span>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="form-control-label">중학교</label>
+						<div class="input-group">
+							<input id="mSchool" name="mSchool" type="text" class="form-control" disabled="disabled" placeholder="검색을 통해 선택해주세요." v-bind:value="mdSchool">
+							<span class="input-group-btn">
+							<button type="button" class="btn btn-default btn-outline" v-on:click="schoolReset('03')"><i class="icon wb-trash"></i></button>
+							</span>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="form-control-label">고등학교</label>
+						<div class="input-group">
+							<input id="hSchool" name="hSchool" type="text" class="form-control" disabled="disabled" placeholder="검색을 통해 선택해주세요." v-bind:value="hiSchool">
+							<span class="input-group-btn">
+							<button type="button" class="btn btn-default btn-outline" v-on:click="schoolReset('04')"><i class="icon wb-trash"></i></button>
+							</span>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="name" class="form-control-label">현재 학년</label>
+						<div>
+							<select id="grade" name="grade" style="width:100%;" v-bind:value="grade">
+								<option value="1">1</option>
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+								<option value="5">5</option>
+								<option value="6">6</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-12 panel-marge mobile-p-b-0">
+				<div class="panel p-25">
+					<h4 class="m-t-0"><i aria-hidden="true" class="icon fa-plus m-r-5 text-primary"></i>추가 정보</h4>
+					<div class="row">
+						<div class="col-lg-3">
+							<div class="form-group">
+								<label class="form-control-label">차량 탑승 여부</label>
+								<div>
+									<div class="radio-custom radio-default radio-inline">
+										<input type="radio" id="carYes" name="carYes" checked="" value="0" v-model="car">
+										<label for="carYes">탑승</label>
+									</div>
+									<div class="radio-custom radio-default radio-inline">
+										<input type="radio" id="carNo" name="carNo" value="1" v-model="car">
+										<label for="carNo">미탑승</label>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-9">
+							<div class="form-group">
+								<label for="recommend" class="form-control-label">지인추천</label>
+								<input type="text" id="recommend" name="recommend" placeholder="지인추천 내용을 입력해주세요." class="form-control" maxlength="100" v-model="recommend">
+							</div>
+						</div>
+						<div class="col-lg-12">
+							<div class="form-group">
+								<label for="name" class="form-control-label">형제관계</label>
+								<div class="btn-group" id="siblingToolbar" role="group">
+									<button type="button" class="btn btn-outline btn-default" v-on:click="siblingModalOpen()">
+									<i class="icon wb-plus" aria-hidden="true"></i>
+									</button>
+									<button type="button" class="btn btn-outline btn-default" v-on:click="siblingDelete()">
+									<i class="icon wb-trash" aria-hidden="true"></i>
+									</button>
+								</div>
+								
+								<table class="table table-hover" id="sibling">
+								<thead>
+								<tr>
+									<th data-field="state" data-checkbox="true">
+									</th>
+									<th data-field="idx" data-class="hidden">
+										히든
+									</th>
+									<th data-field="relation">
+										관계
+									</th>
+									<th data-field="name">
+										이름
+									</th>
+									<th data-field="school">
+										학교
+									</th>
+									<th data-field="grade">
+										학년
+									</th>
+								</tr>
+								</thead>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-12">
+				<div class="panel p-25 m-b-0">
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="media">
+								<div class="pr-20">
+									<span class="avatar avatar-online">
+									<img width="60" height="60" alt="avatar" th:attr="avatar=${member.avatar}">
+									</span>
+								</div>
+								<div class="media-body">
+									<h5 class="list-group-item-heading mt-0 mb-5" th:text="${member.name}">
+									</h5>
+									<p class="list-group-item-text" v-text="today">
+									</p>
+								</div>
+							</div>
+							<button id="studentCreateButton" type="submit" class="action-btn btn btn-primary m-r-5">등록</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	</form>
+	<!-- Modal -->
+	<div class="modal fade modal-primary" id="siblingModal" aria-hidden="true" aria-labelledby="siblingModal" role="dialog" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">×</span>
+					</button>
+					<h4 class="modal-title">형제 등록</h4>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+						<label for="name" class="form-control-label">관계</label>
+						<div>
+							<select id="siblingRelation" class="modal fade" name="siblingRelation" style="width:100%;" v-bind:value="siblingRelation">
+								<option value="형">형</option>
+								<option value="누나">누나</option>
+								<option value="남동생">남동생</option>
+								<option value="여동생">여동생</option>
+								<option value="기타">기타</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="name" class="form-control-label">이름</label>
+						<input type="text" id="siblingName" name="siblingName" placeholder="이름을 입력해주세요." class="form-control" maxlength="20" v-model="siblingName">
+					</div>
+					<div class="form-group">
+						<label for="name" class="form-control-label">학교</label>
+						<div class="input-group">
+							<input type="text" class="form-control" name="" placeholder="학교를 검색해주세요." v-model="siblingSchoolSearchQuery" v-on:keyup.enter="siblingSchoolSearch">
+							<span class="input-group-btn">
+							<button type="button" class="btn btn-primary" v-on:click="siblingSchoolSearch"><i class="icon wb-search" aria-hidden="true"></i></button>
+							</span>
+						</div>
+						<div id="siblingSearchResult" style="display:none;">
+							<ul class="list-group list-group-full">
+								<li class="list-group-item list-group-item-action p-10 school-name" v-for="item in siblingSchoolList" v-on:click="siblingSchoolSelect(item)">
+								<span class="badge badge-pill badge-danger" v-if="item.type==='04'">고등</span>
+								<span class="badge badge-pill badge-info" v-if="item.type==='03'">중등</span>
+								<span class="badge badge-pill badge-success" v-if="item.type==='02'">초등</span>
+								<span class="badge badge-pill badge-warning" v-text="item.location"></span>
+								<span class="m-b-5" v-text="item.name"></span>
+								</li>
+								<li id="siblingSchoolNotResult" class="list-group-item list-group-item-action p-10" style="display:none;">
+								<span class="text-center">검색 결과가 없습니다.</span>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div class="form-group">
+						<input id="siblingSchool" name="siblingSchool" type="text" class="form-control" disabled="disabled" placeholder="검색을 통해 선택해주세요." v-bind:value="siblingSchool">
+					</div>
+					<div class="form-group">
+						<label for="name" class="form-control-label">학년</label>
+						<div>
+							<select id="siblingGrade" name="siblingGrade" style="width:100%;" v-bind:value="siblingGrade">
+								<option value="1">1</option>
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+								<option value="5">5</option>
+								<option value="6">6</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" v-on:click="siblingAdd()">추가</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">취소</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End Modal -->
+</div>
+</th:block>
+
+<th:block layout:fragment="vuejs">
+	<script th:attr="src=@{'/js/vue/studentCreateVue.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customScript">
+	<script th:attr="src=@{'/vendor/daum/postcode.v2.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+	<script th:attr="src=@{'/js/custom/bootstrap-table.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+	<script th:attr="src=@{'/js/custom/student-create.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customStyle">
+	<link rel="stylesheet" th:attr="href=@{'/css/custom/student-create.css?ver=' + ${@environment.getProperty('app.version')}}">
+</th:block>
+</html>

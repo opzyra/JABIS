@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" 
+xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{layout/app_layout.html}" 
+th:with="
+title='JABIS', 
+bodyClass='animsition app-work site-navbar-small',  
+menu='#menuConfig, #menuClassSet'
+">
+
+<th:block layout:fragment="page">
+
+<div id="classListVue" class="page">
+
+	<div class="page-content container-fluid">
+		
+		<div class="row">
+			<div class="col-lg-8">
+				<div class="panel p-25 panel-marge mobile-p-b-0" style="height:130.8px">
+					<div class="panel-header">
+						<h3 class="m-t-0">반 편성</h3> 
+						<div><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>등록된 학생들의 반을 편성합니다.</div> 
+						<div><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>일반과 시험기간으로 구분되어있으며 동일한 이름의 반은 개설할 수 없습니다.</div>
+					</div>
+					
+				</div>
+			</div>
+			<div class="col-lg-4">
+				<div class="panel p-25 panel-marge ">
+					<button type="button" class="btn btn-icon btn-block btn-primary btn-outline" v-on:click="addClassModal()"><i class="icon fa-plus m-r-5" aria-hidden="true"></i>반 개설</button>
+					<button type="button" class="btn btn-icon btn-block btn-primary btn-outline" v-on:click="modifyClassMode()"><i class="icon wb-pencil m-r-5" aria-hidden="true"></i>반 수정</button>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+					<div class="row">
+						<div class="col-lg-7 p-0">
+							<div class="category">
+								<h4 class="m-t-0"><i class="icon fa-code-fork m-r-5 text-primary" aria-hidden="true"></i>범주 선택</h4>
+								<ul class="nav nav-tabs nav-tabs-line">
+									<li class="nav-item" role="presentation">
+									<a class="nav-link" href="javascript:void(0)" aria-controls="forum-newest" aria-expanded="true" role="tab" v-bind:class="{ active: isActive.nomal }" v-on:click="switchStatus('nomal')">일반</a>
+									</li>
+									<li class="nav-item">
+									<a class="nav-link" href="javascript:void(0)" aria-controls="forum-activity" aria-expanded="false" role="tab" v-bind:class="{ active: isActive.test }" v-on:click="switchStatus('test')">시험기간</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="col-lg-5">
+							<ul class="panel-info">
+					            <li>
+					              <div class="num blue-600" v-text="classCount"></div>
+					              <p>반</p>
+					            </li>
+					            <li>
+					              <div class="num green-600" v-text="studentAllCount"></div>
+					              <p>재원</p>
+					            </li>
+					            <li>
+					              <div class="num orange-600" v-text="studentNoneCount"></div>
+					              <p><a href="javascript:void(0)" v-on:click="noneStudentModal()">미배정</a></p>
+					            </li>
+					          </ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="panel p-30 mobile-height-auto mobile-table m-b-0" style="height: 995px; min-height: fit-content;">
+					<div class="input-search m-b-20">
+		              <i class="input-search-icon wb-search" aria-hidden="true"></i>
+		              <input type="text" class="form-control" id="query" name="query" placeholder="편성된 학생 검색" v-model="query" v-on:keyup.enter="search()">
+		             </div>
+					<table class="table">
+			            <thead>
+			              <tr>
+			                <th width="20%">반</th>
+			                <th>배정 학생</th>
+			                <th width="15%">인원</th>
+			              </tr>
+			            </thead>
+			            <tbody>
+			              <tr v-for="item in list">
+			                <td class="action">
+			                	<span v-text="item.className"></span>
+			                	<span class="class-help" v-show="modifyMode == true">
+			                		<button type="button" class="btn btn-pure btn-default icon wb-pencil p-0 btn-edit" v-on:click="updateClassModal(item.className)"></button>
+			                		<button type="button" class="btn btn-pure btn-default icon wb-trash p-0 btn-trash" v-on:click="deleteClass(item.className)"></button>
+			                	</span>
+			                </td>
+			                <td class="action">
+			                	<div class="inline-block" v-for="list in item.students">
+			                		<button class="btn btn-primary btn-icon btn-outline btn-round btn-xs p-5 m-5" v-on:click="updateNoneStudent(list.idx)" type="button"><span v-text="list.name"></span><i class="icon fa-close m-l-5" aria-hidden="true"></i></button>
+			                	</div>
+			                	<div class="inline-block">
+			                		<button class="btn btn-success btn-icon btn-outline btn-round btn-xs p-5 m-5" type="button" v-on:click="noneStudentModal(item.className)">배정<i class="icon fa-plus m-l-5" aria-hidden="true"></i></button>
+			                	</div>
+			                </td>
+			                <td class="action">
+			                	<span v-text="item.students.length"></span>
+			                </td>
+			              </tr>
+			              <tr v-if="list.length == 0">
+			                <td colspan="3" class="text-center">
+			                	개설된 반이 없거나 검색결과가 없습니다.
+			                </td>
+			              </tr>
+			            </tbody>
+			          </table>
+			          <div class="m-t-10">
+			          	<ul id="pagination" class="pagination pagination-sm pagination-gap"></ul>
+			          </div>
+			          
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal -->
+	<div class="modal fade modal-primary" id="noneStudentModal" aria-hidden="true" aria-labelledby="noneStudentModal" role="dialog" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">×</span>
+					</button>
+					<h4 class="modal-title" v-text="modalTitle">반 편성</h4>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+						<label for="name" class="form-control-label">반</label>
+						<div>
+							<select id="classList" class="modal fade" name="noneStudentList" style="width:100%;">
+								<option v-for="item in list" v-bind:value="item.className" v-text="item.className"></option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="name" class="form-control-label">미배정 학생</label>
+						<select id="studentList" class="form-control" multiple="multiple">
+	                        <option v-for="item in classNoneStudent" v-bind:value="item.idx" v-text="item.name"></option>
+                   		 </select>
+                
+					</div>
+				</div>	
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" v-on:click="updateStudent()">편성</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">취소</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End Modal -->
+	
+	<!-- Modal -->
+	<div class="modal fade modal-primary" id="addClass" aria-hidden="true" aria-labelledby="addClass" role="dialog" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">×</span>
+					</button>
+					<h4 class="modal-title" v-text="modalText">반 개설</h4>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+						<label for="type" class="form-control-label">반 종류</label>
+						<select id="type" class="modal fade" name="type" style="width:100%;">
+							<option value="0">일반</option>
+							<option value="1">시험기간</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="className" class="form-control-label">반 이름</label>
+                		<input type="text" id="className" name="className" placeholder="반 이름을 입력해 주세요." class="form-control" maxlength="20" v-model="modalClassName">
+					</div>
+				</div>	
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" v-on:click="addClass()">개설</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">취소</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End Modal -->
+	
+	<!-- Modal -->
+	<div class="modal fade modal-primary" id="updateClass" aria-hidden="true" aria-labelledby="updateClass" role="dialog" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">×</span>
+					</button>
+					<h4 class="modal-title">반 이름 변경</h4>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+						<label for="className" class="form-control-label">변경 전 반 이름</label>
+                		<input type="text" id="modalUpdateOriginClassName" name="modalUpdateOriginClassName" class="form-control" v-model="modalUpdateOriginClassName" disabled="disabled">
+					</div>
+					<div class="form-group">
+						<label for="className" class="form-control-label">변경 후 반 이름</label>
+                		<input type="text" id="modalUpdateClassName" name="modalUpdateClassName" placeholder="변경할 반 이름을 입력해 주세요." class="form-control" maxlength="20" v-model="modalUpdateClassName">
+					</div>
+				</div>	
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" v-on:click="updateClassname()">변경</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">취소</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End Modal -->
+	
+</div>
+
+</th:block>
+
+<th:block layout:fragment="vuejs">
+	<script th:attr="src=@{'/js/vue/classListVue.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customScript">
+	<script th:attr="src=@{'/js/common/Plugin/toolbar.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+	<script th:attr="src=@{'/js/custom/class.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customStyle">
+	<link rel="stylesheet" th:attr="href=@{'/css/custom/class.css?ver=' + ${@environment.getProperty('app.version')}}">
+</th:block>
+
+</html>

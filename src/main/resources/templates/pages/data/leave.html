@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" 
+xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{layout/app_layout.html}" 
+th:with="
+title='JABIS', 
+bodyClass='animsition page-project student-list site-navbar-small',  
+menu='#menuData, #menuLeave'
+">
+
+<th:block layout:fragment="page">
+<input type="hidden" id="monthParam" th:value="${month}">
+<input type="hidden" id="yearParam" th:value="${year}">
+<div id="leaveVue" class="page">
+	<div class="page-content container-fluid">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+					<div class="row">
+						<div class="col-lg-12 p-0">
+							<div class="panel-header">
+								<h3 class="m-t-0">휴원 현황</h3> 
+								<div><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>JABIS에 등록된 담임의 휴원생에 대한 정보를 제공합니다.</div>
+								<div><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>일시를 선택하면 전월 25일 부터 익월 24일까지의 휴원 현황을 확인할 수 있습니다.</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+					<h5 class="m-t-0"><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>일시 선택<span class="f-s-12 m-l-5">(<span v-text="start"></span> ~ <span v-text="end"></span>)</span></h5>
+	                <div class="input-group">
+	                    <span class="input-group-addon">
+	                      <i class="icon wb-calendar" aria-hidden="true"></i>
+	                    </span>
+	                    <input type="text" class="form-control" id="month">
+	                </div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="panel p-30 mobile-height-auto mobile-table m-b-0" style="height:986px">
+				<div id="loadingBar" class="loading-bar">
+			      <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+			    </div>
+					<table class="table table-hover toggle-circle" id="teacherList"
+                  data-paging="true" data-filtering="true" data-sorting="true" data-paging-size="20">
+                  <thead>
+                    <tr>
+                      <th data-name="hrtName">이름</th>
+                      <th data-name="roleName" data-breakpoints="xs sm md">직책</th>
+                      <th data-name="hrtCount" class="text-center">담당 학생</th>
+                      <th data-name="leaveCount" class="text-center">휴원생</th>
+                      <th data-name="leaveRate" class="text-center">휴원률</th>
+                      <th data-name="listName" class="text-center" data-breakpoints="xs sm md" style="width: 50%">학생 명단</th>
+                    </tr>
+                  </thead>
+                </table>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+	
+</div>
+
+</th:block>
+
+<th:block layout:fragment="vuejs">
+	<script th:attr="src=@{'/js/vue/leaveVue.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customScript">
+	<script th:attr="src=@{'/js/custom/leave.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customStyle">
+	<link rel="stylesheet" th:attr="href=@{'/css/custom/leave.css?ver=' + ${@environment.getProperty('app.version')}}">
+</th:block>
+
+</html>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.components.score.data.HighMoiDao">
+	
+	<insert id="createOne" parameterType="HighMoiEntity">
+		INSERT
+		INTO HIGH_MOI
+		VALUES(
+			#{scoreIdx},
+			#{subjectCode},
+			#{score},
+			#{rating}
+		)
+	</insert>
+	
+	<select id="read" resultType="com.app.components.score.param.HighMoiOutParam" parameterType="Integer">
+		SELECT
+			*
+		FROM
+			HIGH_MOI LEFT JOIN SUBJECT
+		ON
+			HIGH_MOI.SUBJECT_CODE = SUBJECT.IDX
+		LEFT JOIN SCORE
+		ON
+			HIGH_MOI.SCORE_IDX = SCORE.IDX
+		WHERE
+			HIGH_MOI.SCORE_IDX = #{param1}
+		ORDER BY
+			SUBJECT.ORDER
+	</select>
+	
+	<delete id="deleteOne">
+		DELETE
+		FROM HIGH_MOI
+		WHERE
+			SCORE_IDX = #{param1} AND
+			SUBJECT_CODE = #{param2}
+	</delete>
+	
+	<update id="updateOne" parameterType="HighMoiEntity">
+		UPDATE
+			HIGH_MOI
+		SET
+			SCORE = #{score},
+			RATING = #{rating}
+		WHERE
+			SCORE_IDX = #{scoreIdx} AND
+			SUBJECT_CODE = #{subjectCode}
+	</update>
+
+</mapper>

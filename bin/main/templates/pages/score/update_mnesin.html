@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" 
+xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{layout/app_layout.html}" 
+th:with="
+title='JABIS', 
+bodyClass='animsition page-project student-edit site-navbar-small', 
+menu='#menuStudent, #menuScore'
+">
+<th:block layout:fragment="page">
+<input type="hidden" id="studentIdx" th:value="${studentIdx}">
+<input type="hidden" id="scoreIdx" th:value="${scoreIdx}">
+<div id="scoreUpdateMnesinVue" class="page">
+	
+	<div class="page-content container-fluid">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+					<div class="row">
+						<div class="col-lg-7">
+							<div class="panel-header">
+								<h3 class="m-t-0">
+									성적 수정
+									<span class="mobile-filter m-l-5"><i class="icon fa-warning" aria-hidden="true"></i></span>
+								</h3> 
+								<div>
+									<i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>선택된 학생의 성적을 수정합니다.</div> <div>
+									<i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>정확한 데이터 구축을 위해 성적 입력시 주의 사항을 꼭 읽어주세요.</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-5 panel-header-help">
+							<button type="button" class="btn btn-danger" v-on:click="deleteMiddleNesin()">삭제</button>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+			<div class="col-lg-7">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+				<h4 class="m-t-0"><i aria-hidden="true" class="icon fa-tag m-r-5 text-primary"></i>상세 정보</h4>
+	        	<div class="form-group row filter">
+	               <div class="col-md-12 col-padding">
+	               	<label class="col-form-label label-block">
+	              	 <i class="icon fa-angle-double-right m-r-5 text-primary" aria-hidden="true"></i>이름 
+	                </label>
+	                <span v-text="name"></span>
+	               </div>
+	             </div>
+	             <div class="form-group row filter">
+	               <div class="col-md-12 col-padding">
+	               	<label class="col-form-label label-block">
+	              	 <i class="icon fa-angle-double-right m-r-5 text-primary" aria-hidden="true"></i>학교 
+	                </label>
+	                <span class="m-r-10" v-text="school">송촌고등학교</span><span v-if="school != '미입력'"><span v-text="grade"></span>학년</span>
+	               </div>
+	             </div>
+	             <div class="form-group row filter">
+	               <div class="col-md-12 col-padding">
+	               	<label class="col-form-label label-block">
+	              	 <i class="icon fa-angle-double-right m-r-5 text-primary" aria-hidden="true"></i>연도 
+	                </label>
+	                <input type="text" id="year" class="form-control form-control-inline" disabled="disabled">
+	               </div>
+	             </div>
+				 <div class="form-group row filter">
+	               <div class="col-md-12 col-padding">
+	               	<label class="col-form-label label-block">
+	              	 <i class="icon fa-angle-double-right m-r-5 text-primary" aria-hidden="true"></i>분류 
+	                </label>
+	                <select id="mode" name="mode" class="form-control form-control-inline" v-model="mode" style="width: 50%" disabled="disabled">
+						<option value="0">중등부 내신</option>
+						<option value="1" v-if="gradeCode == 3">고등부 내신</option>
+						<option value="2" v-if="gradeCode == 3">모의고사</option>
+					</select>
+	               </div>
+	             </div>
+	             <div class="form-group row filter">
+	               <div class="col-md-12 col-padding">
+	               	<label class="col-form-label label-block m-r-60"></label>
+					<select id="type" name="type" class="form-control form-control-inline" style="width: 50%" v-model="type" disabled="disabled">
+						<option v-for="item in typeList" v-bind:value="item.value" v-text="item.text"></option>
+					</select>
+	               </div>
+	             </div>
+				</div>
+			</div>
+			<div class="col-lg-5 filter-box" id="filterBox">
+				<div class="panel p-25 panel-marge score-height-auto f-s-12" style="height: 313.15px">
+					<h4 class="m-t-0"><i aria-hidden="true" class="icon fa-warning m-r-5 text-primary"></i>성적 입력시 주의 사항</h4>
+					<div class="m-b-5"><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i><span>상세 정보의 내용이 올바른지 확인해주세요.</span></div>
+					<div class="m-b-5"><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>점수는 소수점 둘째자리까지 허용됩니다.</div>
+					<div class="m-b-5"><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>하단의 5개 모든 과목의 성적 점수를 입력해야만 합니다.</div>
+					<div class="m-b-5"><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>수정할 과목의 입력상태가 <i class="icon fa-check text-success"></i> 일 경우 수정이 가능합니다.</div>
+					<div class="m-b-5"><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>입학 전 성적 수정시 그외 정확한 데이터를 입력해주세요.</div>
+					<div class="m-b-5"><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i><span class="text-primary">모든 정보 입력시 석차정보가 자동계산 됩니다.</span></div>
+				</div>
+			</div>
+			<div class="col-lg-12">
+				<div class="panel p-25 panel-marge score-height-auto mobile-p-b-10" style="height: 451px; min-height: fit-content;">
+					<h4 class="m-t-0"><i aria-hidden="true" class="icon fa-terminal m-r-5 text-primary"></i>점수 입력</h4>
+					
+					<div>
+						<table class="table table-hover toggle-circle" id="middleNesinList"
+		                  data-paging="true" data-filtering="flase" data-sorting="false" data-paging-size="30">
+		                  <thead>
+		                    <tr>
+		                      <th data-name="subject">과목</th>
+		                      <th data-name="score" data-breakpoints="xs sm md">원점수</th>
+		                      <th data-name="average" data-breakpoints="xs sm md">과목평균</th>
+		                      <th data-name="deviation" data-breakpoints="xs sm md">표준편차</th>
+		                      <th data-name="applicants" data-breakpoints="xs sm md">학생수</th>
+		                      <th data-name="status" class="text-center">입력상태</th>
+		                    </tr>
+		                  </thead>
+		                  <tbody>
+		                  <tr v-for="(item, index) in middleNesin">
+	                  		<td v-text="item.text"></td>
+	                  		<td><input type="text" class="score-bind form-control" v-bind:value="item.score" onchange="doubleCheck(this, 0)" v-bind:data-idx="index"></td>
+	                  		<td><input type="text" class="score-bind form-control" v-bind:value="item.average" onchange="doubleCheck(this, 2)" v-bind:data-idx="index" ></td>
+	                  		<td><input type="text" class="score-bind form-control" v-bind:value="item.deviation" onchange="doubleCheck(this, 1)" v-bind:data-idx="index" ></td>
+	                  		<td><input type="text" class="score-bind form-control" v-bind:value="item.applicants" onchange="intCheck(this, 3)" v-bind:data-idx="index"></td>
+	                  		<td v-bind:id="index" class="text-center">
+	                  			<i class="icon fa-check text-success hidden"></i>
+	                  			<i class="icon fa-ban text-danger"></i>
+	                  		</td>
+	                  	 </tr>
+		                  </tbody>
+		                </table>		                
+					</div>
+				</div>
+				
+			</div>
+			<div class="col-lg-12">
+					<div class="panel p-25 m-b-0">
+						<div class="media">
+							<div class="pr-20">
+								<span class="avatar avatar-online">
+								<img width="60" height="60" alt="avatar" th:attr="avatar=${member.avatar}">
+								</span>
+							</div>
+							<div class="media-body">
+								<h5 class="list-group-item-heading mt-0 mb-5" th:text="${member.name}">
+								</h5>
+								<p class="list-group-item-text" v-text="today">
+								</p>
+							</div>
+						</div>
+						<div class="action-btn-location">
+							<button type="button" class="btn btn-primary m-r-5" v-on:click="updateMiddleNesin()">수정</button>
+						</div>
+						
+					</div>
+				</div>
+		</div>
+	</div>
+
+</div>
+</th:block>
+
+<th:block layout:fragment="vuejs">
+	<script th:attr="src=@{'/js/vue/scoreUpdateMnesinVue.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customScript">
+	<script th:attr="src=@{'/js/custom/score-update-mnesin.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customStyle">
+	<link rel="stylesheet" th:attr="href=@{'/css/custom/score.css?ver=' + ${@environment.getProperty('app.version')}}">
+</th:block>
+</html>

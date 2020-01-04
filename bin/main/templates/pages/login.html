@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" 
+xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{layout/login_layout.html}" 
+th:with="
+title='JABIS', 
+bodyClass='animsition page-login-v2 layout-full page-dark'
+">
+<th:block layout:fragment="page">
+<div id="loginVue" class="page" data-animsition-in="fade-in" data-animsition-out="fade-out">
+	<div class="page-content">
+		<div class="page-brand-info">
+			<div class="brand">
+				<img class="brand-img" src="/images/logo@2x.png" alt="...">
+				<h2 class="brand-text font-size-40" th:text="${title}">Application</h2>
+			</div>
+			<p class="font-size-20">
+				A computerized system, process, or business is one in which the work is done by Network.
+			</p>
+		</div>
+		<div class="page-login-main animation-slide-right animation-duration-1">
+			<div class="brand hidden-md-up">
+				<img class="brand-img" src="/images/logo-colored@2x.png" alt="...">
+				<h3 class="brand-text font-size-40" th:text="${title}">Application</h3>
+			</div>
+			<h3 class="font-size-24">로그인</h3>
+			<p>
+				제일학원 학생/강사 통합관리 프로그램
+			</p>
+			<form id="loginForm" method="post" autocomplete="off" role="form">
+				<div class="form-group">
+					<label class="sr-only" for="inputEmail">Email</label>
+					<input type="text" class="form-control" id="email" name="email" placeholder="이메일" data-fv-field="email" v-model="email" th:value="${email}">
+				</div>
+				<div class="form-group">
+					<label class="sr-only" for="inputPassword">Password</label>
+					<input type="password" class="form-control" id="password" name="password" placeholder="비밀번호" data-fv-field="password" v-model="password">
+				</div>
+				<div class="form-group clearfix">
+					<div class="checkbox-custom checkbox-inline checkbox-primary float-left">
+						<input type="checkbox" id="rememberMe" name="rememberMe" v-model="rememberMe" th:checked="${rememberMe}">
+						<label for="rememberMe">이메일 저장하기</label>
+					</div>
+					<a class="float-right" href="javascript:void(0);" v-on:click="restorePassword()">비밀번호 찾기</a>
+				</div>
+				<button id="loginButton" type="submit" class="btn btn-primary btn-block">로그인</button>
+			</form>
+			<p>
+				계정이 없으신가요?<br>
+				<a href="/register/">회원가입</a>
+			</p>
+			<footer class="page-copyright">
+			<p>
+				WEBSITE BY OPZYRA
+			</p>
+			<p>
+				© 2018. All RIGHT RESERVED.
+			</p>
+			<div class="social">
+				<a class="btn btn-icon btn-round social-twitter mx-5" href="javascript:void(0)">
+				<i class="icon fa-github" aria-hidden="true"></i>
+				</a>
+				<a class="btn btn-icon btn-round social-facebook mx-5" href="javascript:void(0)">
+				<i class="icon fa-linkedin" aria-hidden="true"></i>
+				</a>
+				<a class="btn btn-icon btn-round social-google-plus mx-5" href="javascript:void(0)">
+				<i class="icon fa-google-plus" aria-hidden="true"></i>
+				</a>
+			</div>
+			</footer>
+		</div>
+	</div>
+</div>
+</th:block>
+
+<th:block layout:fragment="vuejs">
+	<script th:attr="src=@{'/js/vue/loginVue.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customScript">
+	<script src="/vendor/jquery-placeholder/jquery.placeholder.js"></script>
+	<script src="/js/common/Plugin/jquery-placeholder.js"></script>
+	<script th:if="${rememberMe}==true">
+			$('#rememberMe').prop('checked', true);
+	</script>
+</th:block>
+
+<th:block layout:fragment="customStyle">
+	<link rel="stylesheet" th:attr="href=@{'/css/custom/login-v2.css?ver=' + ${@environment.getProperty('app.version')}}">
+	<style>
+		   body {
+		     background: transparent;
+		   }
+	</style>
+</th:block>
+
+</html>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.components.comments.data.CommentsDao">
+	
+	<resultMap type="CommentsResultMap" id="Comments">
+		<!-- 
+		<id property="idx" column="IDX"></id>
+		<result property="boardIdx" column="BOARD_IDX"/>
+		<result property="email" column="EMAIL"/>
+		<result property="name" column="NAME"/>
+		<result property="avatar" column="AVATAR"/>
+		<result property="contents" column="CONTENTS"/>
+		<result property="writeDate" column="WRITE_DATE"/>
+		 -->
+	</resultMap>
+	
+	<select id="read" resultMap="Comments" parameterType="com.app.components.comments.param.CommentsInParam">
+		<![CDATA[
+		SELECT
+			COMMENTS.IDX,
+			COMMENTS.BOARD_IDX,
+			MEMBER.EMAIL,
+			MEMBER.NAME,
+			MEMBER.AVATAR,
+			COMMENTS.CONTENTS,
+			COMMENTS.WRITE_DATE
+		FROM
+			COMMENTS LEFT JOIN MEMBER
+		ON
+			COMMENTS.EMAIL = MEMBER.EMAIL
+		WHERE
+			COMMENTS.DELETE_STATUS = 0 AND
+			COMMENTS.BOARD_IDX = #{boardIdx}		
+		ORDER BY 
+			COMMENTS.IDX
+		LIMIT #{offset}, #{limit};
+		]]>
+	</select>
+	
+	<insert id="createOne" parameterType="com.app.components.comments.param.WriteInParam">
+		INSERT 
+		INTO COMMENTS(
+			BOARD_IDX,
+			EMAIL, 
+			CONTENTS
+		)
+		VALUES(
+			#{boardIdx},
+			#{email},
+			#{contents}
+		)
+	</insert>
+	
+	<update id="modifyOne" parameterType="com.app.components.comments.param.ModifyInParam">
+		UPDATE
+			COMMENTS
+		SET
+			CONTENTS = #{contents}
+		WHERE
+			IDX = #{idx} AND
+			EMAIL = #{email}	
+	</update>
+	
+	<update id="deleteOne" parameterType="com.app.components.comments.param.ModifyInParam">
+		UPDATE
+			COMMENTS
+		INNER JOIN BOARD
+		ON COMMENTS.BOARD_IDX = BOARD.IDX 
+		SET
+			COMMENTS.DELETE_DATE = CURRENT_TIMESTAMP,
+			COMMENTS.DELETE_STATUS = 1,
+			BOARD.COMMENTS_COUNT = BOARD.COMMENTS_COUNT-1 
+		WHERE
+			COMMENTS.IDX = #{idx}
+		<if test="email != null">
+			 AND COMMENTS.EMAIL = #{email}
+		</if>	
+	</update>
+	
+</mapper>

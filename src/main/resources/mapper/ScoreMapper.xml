@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.components.score.data.ScoreDao">
+	
+	<resultMap type="MiddleNesinAllDto" id="MiddleNesinAllDto">
+		<id property="idx" column="IDX"/>
+		<result property="studentIdx" column="STUDENT_IDX"/>
+		<result property="year" column="YEAR"/>
+		<result property="type" column="TYPE"/>
+		<collection property="middleNesin" javaType="ArrayList" ofType="com.app.components.score.param.MiddleNesinOutParam" resultMap="map"/>
+	</resultMap>
+
+	<resultMap type="com.app.components.score.param.MiddleNesinOutParam" id="map">
+		<result property="scoreIdx" column="SCORE_IDX"/>
+		<result property="subjectCode" column="SUBJECT_CODE"/>
+		<result property="score" column="SCORE"/>
+		<result property="ranking" column="RANKING"/>
+		<result property="name" column="NAME"/>
+	</resultMap>
+	
+	<resultMap type="HighMoiAllDto" id="HighMoiAllDto">
+		<id property="idx" column="IDX"/>
+		<result property="studentIdx" column="STUDENT_IDX"/>
+		<result property="year" column="YEAR"/>
+		<result property="type" column="TYPE"/>
+		<collection property="highMoi" javaType="ArrayList" ofType="HighMoiEntity" resultMap="map2"/>
+	</resultMap>
+	
+	<resultMap type="HighMoiEntity" id="map2">
+		<result property="scoreIdx" column="SCORE_IDX"/>
+		<result property="subjectCode" column="SUBJECT_CODE"/>
+		<result property="score" column="SCORE"/>
+		<result property="rating" column="RATING"/>
+		<result property="name" column="NAME"/>
+	</resultMap>
+	
+	<insert id="createOne" parameterType="ScoreEntity" useGeneratedKeys="true" keyProperty="idx" keyColumn="IDX">
+		INSERT
+		INTO SCORE(
+			STUDENT_IDX,
+			YEAR,
+			MODE,
+			TYPE
+		)
+		VALUES(
+			#{studentIdx},
+			#{year},
+			#{mode},
+			#{type}
+		)
+	</insert>
+	
+	<select id="read" parameterType="com.app.components.score.param.ScoreReadInParam" resultType="ScoreEntity">
+		SELECT
+			*
+		FROM
+			SCORE
+		WHERE
+			STUDENT_IDX = #{studentIdx} AND
+			MODE = #{mode}
+		ORDER BY
+			YEAR DESC, TYPE DESC
+	</select>
+
+	<select id="readAll" resultMap="MiddleNesinAllDto">
+		SELECT
+			SCORE.IDX,
+			SCORE.STUDENT_IDX,
+			SCORE.YEAR,
+			SCORE.TYPE,
+			MIDDLE_NESIN.SCORE_IDX,
+			MIDDLE_NESIN.SUBJECT_CODE,
+			MIDDLE_NESIN.SCORE,
+			MIDDLE_NESIN.RANKING,
+			SUBJECT.NAME
+		FROM
+			SCORE LEFT JOIN MIDDLE_NESIN
+		ON
+			SCORE.IDX = MIDDLE_NESIN.SCORE_IDX
+		LEFT JOIN SUBJECT
+		ON
+			MIDDLE_NESIN.SUBJECT_CODE = SUBJECT.IDX
+		WHERE
+			SCORE.STUDENT_IDX = #{param1} AND
+			SCORE.MODE = 0
+	</select>
+	
+	<select id="readMoiAll" resultMap="HighMoiAllDto">
+		SELECT
+			SCORE.IDX,
+			SCORE.STUDENT_IDX,
+			SCORE.YEAR,
+			SCORE.TYPE,
+			HIGH_MOI.SCORE_IDX,
+			HIGH_MOI.SUBJECT_CODE,
+			HIGH_MOI.SCORE,
+			HIGH_MOI.RATING,
+			SUBJECT.NAME,
+			SUBJECT.ORDER
+		FROM
+			SCORE LEFT JOIN HIGH_MOI
+		ON
+			SCORE.IDX = HIGH_MOI.SCORE_IDX
+		LEFT JOIN SUBJECT
+		ON
+			HIGH_MOI.SUBJECT_CODE = SUBJECT.IDX
+		WHERE
+			SCORE.STUDENT_IDX = #{param1} AND
+			SCORE.MODE = 2
+	</select>
+	
+	<update id="updateHighAverage">
+		UPDATE
+			SCORE
+		SET
+			HIGH_AVERAGE = #{param1}
+		WHERE
+			IDX = #{param2}
+	</update>
+	
+	<select id="readOne" resultType="ScoreEntity">
+		SELECT
+			*
+		FROM
+			SCORE
+		WHERE
+			IDX = #{param1}
+	</select>
+	
+	<delete id="deleteOne">
+		DELETE
+		FROM
+			SCORE
+		WHERE
+			IDX = #{param1}
+	</delete>
+	
+</mapper>

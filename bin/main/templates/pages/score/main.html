@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" 
+xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{layout/app_layout.html}" 
+th:with="
+title='JABIS', 
+bodyClass='animsition page-project counse-main site-navbar-small',  
+menu='#menuStudent, #menuScore'
+">
+
+<th:block layout:fragment="page">
+<input type="hidden" id="studentIdx" th:value="${studentIdx}">
+<input type="hidden" id="modeParam" th:value="${mode}">
+<div id="scoreVue" class="page">
+	<div class="page-content container-fluid">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+					<div class="panel-header">
+						<h3 class="m-t-0">성적 열람</h3> 
+						<div>
+							<i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>학생 한명에 대한 성적을 확인합니다.</div> <div>
+							<i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>검색 필터링에서 학생 선택 후 <i aria-hidden="true" class="icon fa-search text-primary"></i> 버튼을 클릭하여 성적 데이터를 확인하세요.</span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-12" v-if="myStudents.length != 0">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+					<h4 class="m-t-0"><i aria-hidden="true" class="icon wb-users m-r-5 text-primary"></i>담당 학생</h4>
+					<div class="inline-block" v-for="item in myStudents">
+						<button type="button" class="btn btn-primary btn-icon btn-outline btn-round btn-xs p-5 m-5" v-on:click="myStudentScore(item.idx)"><span v-text="item.name"></span><i aria-hidden="true" class="icon fa-search m-l-5"></i></button>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-8">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+					<h4 class="m-t-0"><i aria-hidden="true" class="icon fa-filter m-r-5 text-primary"></i>검색 필터링</h4>
+					<div class="form-group row filter">
+		               <div class="col-md-12 col-padding">
+		               	<label class="col-form-label label-block">
+		              	 <i class="icon fa-angle-double-right m-r-5 text-primary" aria-hidden="true"></i>학생 이름 
+		                </label>
+		                 <select id="name" name="name" class="form-control form-control-inline schools" v-model="studentIdx">
+							<option v-for="item in students" v-bind:value="item.idx" v-text="item.name"></option>
+						</select>
+						<button v-on:click="searchScore()" type="button" class="btn btn-icon btn-primary btn-sm"><i class="icon fa-search"></i></button>
+		               </div>
+		               <div>
+		               	<div class="col-md-12 col-padding">
+		               	<label class="col-form-label label-inline m-r-50">
+		              	 <i class="icon fa-angle-double-right m-r-5 text-primary" aria-hidden="true"></i>학교 
+		                </label>
+		                <span v-text="school"></span>
+		                <span v-if="school != '-' && school != '미입력'">
+		                	<span v-text="grade" class="m-r-5"></span>학년
+		                </span>
+		               </div>
+		               
+		               <div class="col-md-12 col-padding">
+		               	<label class="col-form-label label-inline m-r-50">
+		              	 <i class="icon fa-angle-double-right m-r-5 text-primary" aria-hidden="true"></i>담임 
+		                </label>
+		                	<span v-text="hrtName"></span>
+		               </div>
+		               
+		               </div>
+		               
+		             </div>
+				</div>
+			</div>
+			<div class="col-lg-4" v-show="isMobile == false || selected == true">
+				<div class="panel p-25 panel-marge mobile-p-b-0 menu-height-auto" style="height: 221.13px">
+					<h4 class="m-t-0 filter-box"><i aria-hidden="true" class="icon wb-menu m-r-5 text-primary"></i>메뉴</h4>
+					<div class="m-t-6" sec:authorize="hasAnyAuthority('ROLE_WEB', 'ROLE_ADMIN', 'ROLE_MASTER', 'ROLE_TEAM', 'ROLE_HRT')" v-if="selected">
+						<button id="articleEditButton" type="button" class="btn btn-icon btn-block btn-primary btn-outline" v-on:click="createScore()"><i class="icon wb-pencil m-r-5" aria-hidden="true"></i><span v-text="name"></span> 학생 성적 등록</button>
+						<button v-if="scoreDetail.length != 0 && !isAll" type="button" class="btn btn-icon btn-block btn-primary btn-outline" v-on:click="updateScore()"><i class="icon wb-edit m-r-5" aria-hidden="true"></i>선택된 성적 수정</button>
+						<button v-if="isMobile == false && (scoreDetail.length != 0 || isAll)" v-on:click="pdfScore()" type="button" class="btn btn-icon btn-block btn-primary btn-outline"><i class="icon fa-file-pdf-o m-r-5" aria-hidden="true"></i>PDF 출력</button>
+					</div>
+					
+				</div>
+			</div>
+			<div class="col-lg-12">
+				<div class="panel p-30 mobile-height-auto mobile-table m-b-0" style="height: 1085px; min-height: fit-content;">
+					<div v-show="selected">
+				      	<div class="page-nav-tabs">
+							<ul class="nav nav-tabs nav-tabs-line">
+								<li class="nav-item" role="presentation">
+								<a class="nav-link" href="javascript:void(0)" aria-controls="forum-newest" aria-expanded="true" role="tab" v-bind:class="{ active: isActive.mNesin }" v-on:click="switchStatus(0)">중등부 내신</a>
+								</li>
+								<li class="nav-item" v-show="gradeCode >= 3">
+								<a class="nav-link" href="javascript:void(0)" aria-controls="forum-activity" aria-expanded="false" role="tab" v-bind:class="{ active: isActive.hNesin }" v-on:click="switchStatus(1)">고등부 내신</a>
+								</li>
+								<li class="nav-item" v-show="gradeCode >= 3">
+								<a class="nav-link" href="javascript:void(0)" aria-controls="forum-activity" aria-expanded="false" role="tab" v-bind:class="{ active: isActive.hMoi }" v-on:click="switchStatus(2)">모의고사</a>
+								</li>
+							</ul>
+						</div>
+				      
+				        <div class="score-list-box">
+							<select id="scoreList" name="scoreList" class="form-control">
+								<option></option>
+								<option v-if="score.length != 0" value="0">전체 통계</option>
+								<option v-for="item in score" v-bind:value="item.idx" v-text="item.text"></option>
+							</select>
+				        </div>
+				        
+				        <div v-show="mode == 0">
+				        
+					        <div v-show="isAll && dataSelected">
+				
+				        		<div id="allScoreChart" class="chart-size"></div>
+				        		<div id="allSubjectChart" class="chart-size"></div>
+					            
+					        </div>
+					        
+					        <div v-show="scoreDetail.length != 0 && isAll == false">
+					        	<table class="table table-bordered">
+					               <thead>
+					                 <tr class="table-active">
+					                   <th>과목</th>
+					                   <th>원점수</th>
+					                   <th>과목평균</th>
+					                   <th class="hidden-xs-down">표준편차</th>
+					                   <th>석차</th>
+					                 </tr>
+					               </thead>
+					               <tbody>
+					                 <tr v-for="item in scoreDetail">
+					                   <td v-text="item.name"></td>
+					                   <td v-text="item.score"></td>
+					                   <td v-text="item.average"></td>
+					                   <td v-text="item.deviation" class="hidden-xs-down"></td>
+					                   <td>
+					                     <span v-text="item.ranking"></span>/<span v-text="item.applicants"></span>
+					                   </td>
+					                 </tr>
+					               </tbody>
+					             </table>
+					             
+					             <div id="chart" class="chart-size"></div>
+					             
+					        </div>
+						 
+						 </div>
+						 
+						 <div v-show="mode == 1">
+				        
+					        <div v-show="isAll && dataSelected">
+					        	<div id="allRatingChart" class="chart-size"></div>
+					        </div>
+					        
+					        <div v-show="scoreDetail.length != 0 && isAll == false">
+					        	<blockquote class="blockquote custom-blockquote blockquote-success">
+				                  <p class="mb-0">평균 내신 등급</p>
+				                  <div class="avg-rating"><span class="text-primary m-r-5" v-text="highAverage"></span>등급</div>
+				                </blockquote>
+					        	<table class="table table-bordered">
+					               <thead>
+					                 <tr class="table-active">
+					                   <th>과목</th>
+					                   <th>단위수</th>
+					                   <th>원점수</th>
+					                   <th>등급</th>
+					                 </tr>
+					               </thead>
+					               <tbody>
+					                 <tr v-for="item in scoreDetail">
+					                   <td v-text="item.name"></td>
+					                   <td v-text="item.unit"></td>
+					                   <td v-text="item.score"></td>
+					                   <td v-text="item.rating"></td>
+					                 </tr>
+					               </tbody>
+					             </table>
+				
+					             <div id="highRatingChart" class="chart-size"></div>
+					        </div>
+						 
+						 </div>
+						 
+						 <div v-show="mode == 2">
+				        
+					        <div v-show="isAll && dataSelected">
+					        	<div v-show="chartShow > 1" id="highMoiChart0" class="chart-size"></div>
+					        	<div v-show="chartShow > 0" id="highMoiChart1" class="chart-size"></div>
+					        	<div v-show="chartShow > -1" id="highMoiChart2" class="chart-size"></div>
+					        </div>
+					        
+					        <div v-show="scoreDetail.length != 0 && isAll == false">
+					        	<table class="table table-bordered">
+					               <thead>
+					                 <tr class="table-active">
+					                   <th>과목</th>
+					                   <th>원점수</th>
+					                   <th>등급</th>
+					                 </tr>
+					               </thead>
+					               <tbody>
+					                 <tr v-for="item in scoreDetail">
+					                   <td v-text="item.name"></td>
+					                   <td v-text="item.score"></td>
+					                   <td v-text="item.rating"></td>
+					                 </tr>
+					               </tbody>
+					             </table>
+				
+					             <div id="moiRatingChart" class="chart-size"></div>
+					        </div>
+						 
+						 </div>
+						 
+						 <div v-show="dataSelected == 0">
+							<div class="spinner2">
+							  <div class="bounce1"></div>
+							  <div class="bounce2"></div>
+							  <div class="bounce3"></div>
+							</div>
+							<div class="text-center m-t-5 f-s-16 f-w-700">성적 데이터를 선택해 주세요.</div>
+						 </div>
+						 
+						 
+				      </div>
+				      <div v-show="selected == false">
+						<div class="spinner2">
+						  <div class="bounce1"></div>
+						  <div class="bounce2"></div>
+						  <div class="bounce3"></div>
+						</div>
+						<div class="text-center m-t-5 f-s-16 f-w-700">학생을 선택해 주세요.</div>
+				      </div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+</th:block>
+
+<th:block layout:fragment="vuejs">
+	<script src="/js/vue/scoreVue.js?ver=20180912"></script>
+</th:block>
+
+<th:block layout:fragment="customScript">
+	<script th:attr="src=@{'/js/custom/score.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customStyle">
+	<link rel="stylesheet" th:attr="href=@{'/css/custom/score.css?ver=' + ${@environment.getProperty('app.version')}}">
+</th:block>
+
+</html>

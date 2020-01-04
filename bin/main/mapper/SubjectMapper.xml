@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.components.subject.data.SubjectDao">
+
+	<select id="readAll" parameterType="com.app.components.subject.param.ReadInParam" resultType="SubjectEntity">
+	SELECT
+		*
+	FROM
+		SUBJECT
+	ORDER BY
+		SUBJECT.ORDER
+	LIMIT
+		#{offset}, #{limit}
+	
+	</select>	
+
+	<select id="readAllNoCondition" resultType="SubjectEntity">
+	SELECT
+		*
+	FROM
+		SUBJECT
+	ORDER BY
+		SUBJECT.ORDER
+	</select>
+
+	<select id="count" resultType="Integer">
+	SELECT
+		COUNT(1)
+	FROM
+		SUBJECT
+	</select>
+
+	<insert id="createOne">
+	INSERT
+	INTO SUBJECT(
+		SUBJECT.NAME,
+		SUBJECT.DESCRIPTION,
+		SUBJECT.ORDER
+	)
+	VALUES(
+		#{name},
+		#{description},
+		#{order}
+	)
+	</insert>
+	
+	<update id="updateOne">
+	UPDATE
+		SUBJECT
+	<set>
+		<if test="name != ''">
+			NAME = #{name},
+		</if>
+		<if test="description != ''">
+			DESCRIPTION = #{description}
+		</if>
+	</set>
+	WHERE
+		IDX = #{idx}
+	</update>
+	
+	<update id="updateOrder">
+	UPDATE
+		SUBJECT
+	SET
+		SUBJECT.ORDER = #{order}
+	WHERE
+		IDX = #{idx}
+	</update>
+	
+	<select id="maxCount" resultType="Integer">
+		SELECT COUNT(1) FROM SUBJECT
+	</select>
+
+</mapper>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+	<meta charset="utf-8">
+    <th:block th:replace="fragments/common/meta::metaFragment"></th:block>
+    <title th:text="${title}">Application</title>
+    
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+    
+    <th:block th:replace="fragments/common/css::cssFragment"></th:block>
+    
+    <!--[if lt IE 9]>
+    <script src="/vendor/html5shiv/html5shiv.min.js"></script>
+    <![endif]-->
+    
+    <!--[if lt IE 10]>
+    <script src="/vendor/media-match/media.match.min.js"></script>
+    <script src="/vendor/respond/respond.min.js"></script>
+    <![endif]-->
+    
+    <!-- Scripts -->
+    <script src="/vendor/breakpoints/breakpoints.js"></script>
+    <script>
+      Breakpoints();
+    </script>
+</head>
+<body th:class="${bodyClass}" th:with="member=${#authentication.principal.member}">
+	<!--[if lt IE 8]>
+        <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+    <input type="hidden" id="user" th:value="${member.email}">
+    <input type="hidden" id="userName" th:value="${member.name}">
+    <input type="hidden" id="role" th:value="${member.roleCode}">
+    <input type="text" name="off" style="display:none;">
+    
+    <!-- 공통 모듈 -->
+    <nav th:replace="fragments/common/nav::navFragment"></nav>
+    <div th:replace="fragments/common/menubar::menubarFragment"></div>
+    
+    <!-- 메인화면 페이지 -->
+    <th:block th:replace="fragments/common/page::pageFragment"></th:block>
+    
+    <!-- 비밀번호 모달 -->
+    <th:block th:replace="fragments/common/password::passwordFragment"></th:block>
+    
+    <!-- 푸터 -->
+    <th:block th:replace="fragments/common/footer::footerFragment"></th:block>
+    
+    <!-- 스크립트 -->
+    <th:block th:replace="fragments/common/script::scriptFragment"></th:block>
+</body>
+ 
+</html>

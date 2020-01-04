@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.components.student.data.StudentDao">
+
+	<resultMap type="studentOneDto" id="studentOneMap">
+		<id property="idx" column="IDX"/>
+		<result property="name" column="NAME"/>
+		<result property="status" column="STATUS"/>
+		<result property="gender" column="GENDER"/>
+		<result property="eSchool" column="E_SCHOOL"/>
+		<result property="mSchool" column="M_SCHOOL"/>
+		<result property="hSchool" column="H_SCHOOL"/>
+		<result property="school" column="SCHOOL"/>
+		<result property="grade" column="GRADE"/>
+		<result property="gradeCode" column="GRADE_CODE"/>
+		<result property="phone" column="PHONE"/>
+		<result property="parentPhone" column="PARENT_PHONE"/>
+		<result property="zoneCode" column="ZONE_CODE"/>
+		<result property="addressApi" column="ADDRESS_API"/>
+		<result property="addressInput" column="ADDRESS_INPUT"/>
+		<result property="car" column="CAR"/>
+		<result property="recommend" column="RECOMMEND"/>
+		<result property="regDate" column="REG_DATE"/>
+		<result property="classNomal" column="CLASS_NOMAL"/>
+		<result property="classTest" column="CLASS_TEST"/>
+		<result property="hrtEmail" column="HRT_EMAIL"/>
+		<result property="hrtName" column="HRT_NAME"/>
+		<result property="leaveDate" column="LEAVE_DATE"/>
+		<collection property="sibling" javaType="ArrayList" ofType="com.app.components.sibling.data.SiblingJoinDto" resultMap="map"/>
+	</resultMap>
+
+	<resultMap type="com.app.components.sibling.data.SiblingJoinDto" id="map">
+		<id property="siblingIdx" column="SIBLING_IDX"/>
+		<result property="siblingRelation" column="SIBLING_RELATION"/>
+		<result property="siblingName" column="SIBLING_NAME"/>
+		<result property="siblingSchool" column="SIBLING_SCHOOL"/>
+		<result property="siblingGrade" column="SIBLING_GRADE"/>
+	</resultMap>
+
+	<select id="readOne" resultType="StudentEntity" parameterType="Integer">
+		SELECT
+			STUDENT.IDX,
+			STUDENT.NAME,
+			STUDENT.STATUS,
+			STUDENT.GENDER,
+			STUDENT.E_SCHOOL,
+			STUDENT.M_SCHOOL,
+			STUDENT.H_SCHOOL,
+			STUDENT.SCHOOL,
+			STUDENT.GRADE,
+			STUDENT.GRADE_CODE,
+			STUDENT.PHONE,
+			STUDENT.PARENT_PHONE,
+			STUDENT.ZONE_CODE,
+			STUDENT.ADDRESS_API,
+			STUDENT.ADDRESS_INPUT,
+			STUDENT.CAR,
+			STUDENT.RECOMMEND,
+			STUDENT.REG_DATE,
+			STUDENT.CLASS_NOMAL,
+			STUDENT.CLASS_TEST,
+			STUDENT.HRT_EMAIL,
+			MEMBER.NAME
+		FROM
+			STUDENT LEFT JOIN MEMBER
+		ON
+			STUDENT.HRT_EMAIL = MEMBER.EMAIL
+		WHERE
+			STUDENT.IDX = #{param1}
+	</select>
+	
+	<select id="studentCheck" resultType="StudentEntity" parameterType="String">
+		SELECT
+			STUDENT.IDX,
+			STUDENT.NAME,
+			STUDENT.STATUS,
+			STUDENT.GENDER,
+			STUDENT.E_SCHOOL,
+			STUDENT.M_SCHOOL,
+			STUDENT.H_SCHOOL,
+			STUDENT.SCHOOL,
+			STUDENT.GRADE,
+			STUDENT.GRADE_CODE,
+			STUDENT.PHONE,
+			STUDENT.PARENT_PHONE,
+			STUDENT.ZONE_CODE,
+			STUDENT.ADDRESS_API,
+			STUDENT.ADDRESS_INPUT,
+			STUDENT.CAR,
+			STUDENT.RECOMMEND,
+			STUDENT.REG_DATE,
+			STUDENT.CLASS_NOMAL,
+			STUDENT.CLASS_TEST,
+			STUDENT.HRT_EMAIL,
+			MEMBER.NAME
+		FROM
+			STUDENT LEFT JOIN MEMBER
+		ON
+			STUDENT.HRT_EMAIL = MEMBER.EMAIL
+		WHERE
+			STUDENT.NAME = #{param1}
+		AND
+			STUDENT.STATUS IN (0, 1)
+		LIMIT 1
+	</select>
+	
+	<select id="readAll" resultType="com.app.components.student.data.StudentDto" parameterType="com.app.components.student.param.ReadInParam">
+		SELECT
+			STUDENT.IDX,
+			STUDENT.NAME,
+			STUDENT.STATUS,
+			STUDENT.E_SCHOOL,
+			STUDENT.M_SCHOOL,
+			STUDENT.H_SCHOOL,
+			STUDENT.SCHOOL,
+			STUDENT.GRADE,
+			STUDENT.GRADE_CODE,
+			STUDENT.PHONE,
+			STUDENT.PARENT_PHONE,
+			STUDENT.ZONE_CODE,
+			STUDENT.ADDRESS_API,
+			STUDENT.ADDRESS_INPUT,
+			STUDENT.CAR,
+			STUDENT.RECOMMEND,
+			STUDENT.REG_DATE,
+			STUDENT.CLASS_NOMAL,
+			STUDENT.CLASS_TEST,
+			STUDENT.HRT_EMAIL,
+			MEMBER.NAME AS HRT_NAME,
+			STUDENT_LEAVE.LEAVE_DATE
+		FROM
+			STUDENT LEFT JOIN MEMBER
+		ON
+			STUDENT.HRT_EMAIL = MEMBER.EMAIL
+		LEFT JOIN STUDENT_LEAVE
+		ON
+			STUDENT.IDX = STUDENT_LEAVE.STUDENT_IDX
+		<where>
+			<if test="name != ''">
+				STUDENT.NAME = #{name}
+			</if>
+			<if test="status != null">
+				AND STUDENT.STATUS = #{status}
+			</if>
+			<if test="school != '' || school == null">
+				AND STUDENT.SCHOOL = #{school}
+			</if>
+			<if test="grade != 0">
+				AND STUDENT.GRADE = #{grade}
+			</if>
+			<if test="className != ''">
+				AND (ifnull(STUDENT.CLASS_NOMAL, '미배정') = #{className} OR ifnull(STUDENT.CLASS_TEST, '미배정') = #{className})
+			</if>
+			<if test="hrt != '' || hrt == null">
+				AND ifnull(MEMBER.NAME, '미정') = #{hrt}
+			</if>
+			<if test="status == 3">
+		ORDER BY
+			STUDENT_LEAVE.LEAVE_DATE DESC
+			</if>
+		</where>
+	</select>
+	
+	<select id="readAllExcel" resultType="com.app.components.student.data.StudentDto">
+		SELECT
+			STUDENT.IDX,
+			STUDENT.NAME,
+			STUDENT.STATUS,
+			STUDENT.E_SCHOOL,
+			STUDENT.M_SCHOOL,
+			STUDENT.H_SCHOOL,
+			STUDENT.SCHOOL,
+			STUDENT.GRADE,
+			STUDENT.GRADE_CODE,
+			STUDENT.PHONE,
+			STUDENT.PARENT_PHONE,
+			STUDENT.ZONE_CODE,
+			STUDENT.ADDRESS_API,
+			STUDENT.ADDRESS_INPUT,
+			STUDENT.CAR,
+			STUDENT.RECOMMEND,
+			STUDENT.REG_DATE,
+			STUDENT.CLASS_NOMAL,
+			STUDENT.CLASS_TEST,
+			STUDENT.HRT_EMAIL,
+			MEMBER.NAME AS HRT_NAME
+		FROM
+			STUDENT LEFT JOIN MEMBER
+		ON
+			STUDENT.HRT_EMAIL = MEMBER.EMAIL
+	</select>
+	
+	<select id="readLatest" resultType="com.app.components.student.data.StudentDto">
+	<![CDATA[
+		SELECT
+			STUDENT.IDX,
+			STUDENT.NAME,
+			STUDENT.STATUS,
+			STUDENT.E_SCHOOL,
+			STUDENT.M_SCHOOL,
+			STUDENT.H_SCHOOL,
+			STUDENT.SCHOOL,
+			STUDENT.GRADE,
+			STUDENT.GRADE_CODE,
+			STUDENT.PHONE,
+			STUDENT.PARENT_PHONE,
+			STUDENT.ZONE_CODE,
+			STUDENT.ADDRESS_API,
+			STUDENT.ADDRESS_INPUT,
+			STUDENT.CAR,
+			STUDENT.RECOMMEND,
+			STUDENT.REG_DATE,
+			STUDENT.CLASS_NOMAL,
+			STUDENT.CLASS_TEST,
+			STUDENT.HRT_EMAIL,
+			MEMBER.NAME AS HRT_NAME
+		FROM
+			STUDENT LEFT JOIN MEMBER
+		ON
+			STUDENT.HRT_EMAIL = MEMBER.EMAIL
+		WHERE
+			STUDENT.REG_DATE >= #{start} AND STUDENT.REG_DATE < #{end}
+		ORDER BY
+			STUDENT.REG_DATE DESC
+	]]>
+	</select>
+	
+	<select id="countAll" resultType="com.app.components.student.param.ReadOutParam" >
+	<![CDATA[
+		SELECT 
+			COUNT(1) AS ALL_COUNT,
+			COUNT(if(STATUS = 0, 0, null)) AS STANDBY_COUNT,
+			COUNT(if(STATUS = 1, 1, null)) AS NOW_COUNT,
+			COUNT(if(STATUS = 2, 2, null)) AS DELETED_COUNT,
+			COUNT(if(STATUS = 3, 3, null)) AS BREAK_COUNT
+		FROM
+			STUDENT
+	]]>
+	</select>
+	
+	<select id="readAllNames" resultType="StudentNameDto" parameterType="com.app.components.student.param.StudentNameInParam">
+	<![CDATA[
+		SELECT
+			STUDENT.IDX,
+			STUDENT.NAME,
+			STUDENT.SCHOOL,
+			STUDENT.GRADE,
+			STUDENT.GRADE_CODE,
+			MEMBER.NAME AS HRT_NAME
+		FROM
+			STUDENT LEFT JOIN MEMBER
+		ON
+			STUDENT.HRT_EMAIL = MEMBER.EMAIL
+		WHERE
+			STUDENT.STATUS != 2
+	]]>
+			<if test="email != ''">
+			AND STUDENT.HRT_EMAIL = #{email}
+			</if>
+	</select>
+	
+	<insert id="createOne" parameterType="StudentEntity" useGeneratedKeys="true" keyProperty="idx" keyColumn="IDX">
+		INSERT
+		INTO STUDENT(
+			NAME,
+			STATUS,
+			GENDER,
+			E_SCHOOL,
+			M_SCHOOL,
+			H_SCHOOL,
+			SCHOOL,
+			GRADE,
+			GRADE_CODE,
+			PHONE,
+			PARENT_PHONE,
+			ZONE_CODE,
+			ADDRESS_API,
+			ADDRESS_INPUT,
+			CAR,
+			RECOMMEND,
+			REG_DATE,
+			WRITER_EMAIL
+		)
+		VALUES(
+			#{name},
+			#{status},
+			#{gender},
+			#{eSchool},
+			#{mSchool},
+			#{hSchool},
+			#{school},
+			#{grade},
+			#{gradeCode},
+			#{phone},
+			#{parentPhone},
+			#{zoneCode},
+			#{addressApi},
+			#{addressInput},
+			#{car},
+			#{recommend},
+			#{regDate},
+			#{writerEmail}
+		)
+	</insert>
+	
+	<update id="updateOne" parameterType="StudentEntity">
+		UPDATE
+			STUDENT
+		SET
+			NAME = #{name},
+			STATUS = #{status},
+			<if test="status==0">REG_DATE = null,</if>
+			GENDER = #{gender},
+			E_SCHOOL = #{eSchool},
+			M_SCHOOL = #{mSchool},
+			H_SCHOOL = #{hSchool},
+			SCHOOL = #{school},
+			GRADE = #{grade},
+			GRADE_CODE = #{gradeCode},
+			PHONE = #{phone},
+			PARENT_PHONE = #{parentPhone},
+			ZONE_CODE = #{zoneCode},
+			ADDRESS_API = #{addressApi},
+			ADDRESS_INPUT = #{addressInput},
+			CAR = #{car},
+			<if test="status == 2 || status == 3">HRT_EMAIL = null,</if>
+			<if test="status == 1">HRT_EMAIL = #{hrtEmail},</if>
+			RECOMMEND = #{recommend},
+			WRITER_EMAIL = #{writerEmail}
+		WHERE
+			IDX = #{idx}
+	</update>
+	
+	<select id="studentOne" resultMap="studentOneMap">
+		SELECT
+			STUDENT.IDX,
+			STUDENT.NAME,
+			STUDENT.STATUS,
+			STUDENT.GENDER,
+			STUDENT.E_SCHOOL,
+			STUDENT.M_SCHOOL,
+			STUDENT.H_SCHOOL,
+			STUDENT.SCHOOL,
+			STUDENT.GRADE,
+			STUDENT.GRADE_CODE,
+			STUDENT.PHONE,
+			STUDENT.PARENT_PHONE,
+			STUDENT.ZONE_CODE,
+			STUDENT.ADDRESS_API,
+			STUDENT.ADDRESS_INPUT,
+			STUDENT.CAR,
+			STUDENT.RECOMMEND,
+			STUDENT.REG_DATE,
+			STUDENT.CLASS_NOMAL,
+			STUDENT.CLASS_TEST,
+			STUDENT.HRT_EMAIL,
+			MEMBER.NAME AS HRT_NAME,
+			STUDENT_LEAVE.LEAVE_DATE,
+			SIBLING.IDX AS SIBLING_IDX,
+			SIBLING.RELATION AS SIBLING_RELATION,
+			SIBLING.NAME AS SIBLING_NAME,
+			SIBLING.SCHOOL AS SIBLING_SCHOOL,
+			SIBLING.GRADE AS SIBLING_GRADE,
+			SIBLING.GRADE_CODE AS SIBLING_GRADE_CODE
+		FROM
+			STUDENT LEFT JOIN SIBLING
+		ON
+			STUDENT.IDX = SIBLING.STUDENT_IDX
+		LEFT JOIN MEMBER
+		ON
+			STUDENT.HRT_EMAIL = MEMBER.EMAIL
+		LEFT JOIN STUDENT_LEAVE
+		ON
+			STUDENT.IDX = STUDENT_LEAVE.STUDENT_IDX
+		WHERE
+			STUDENT.IDX = #{param1}
+	</select>
+	
+	<update id="updateStatus" parameterType="com.app.components.student.param.StatusUpdateInParam">
+		UPDATE
+			STUDENT
+		SET
+			<if test="regDate != null">REG_DATE = #{regDate},</if>
+			STATUS = #{status}
+		WHERE
+			IDX = #{idx}
+	</update>
+	
+	<delete id="deleteOne">
+		DELETE
+		FROM
+			STUDENT
+		WHERE
+			IDX = #{param1}
+	</delete>
+	
+	<update id="updateHrtDeleted">
+		UPDATE
+			STUDENT
+		SET
+			HRT_EMAIL = null
+		WHERE
+			HRT_EMAIL = #{param1}
+	</update>
+
+</mapper>

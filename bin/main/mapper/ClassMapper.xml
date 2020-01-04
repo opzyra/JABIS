@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.components.classlist.data.ClassDao">
+
+	<resultMap type="ClassDto" id="ClassDto">
+		<id property="className" column="CLASS_NAME"/>
+		<collection property="students" javaType="ArrayList" ofType="ClassStudent" resultMap="map"/>
+	</resultMap>
+
+	<resultMap type="ClassStudent" id="map">
+		<result property="idx" column="IDX"/>
+		<result property="name" column="NAME"/>
+		<result property="eSchool" column="E_SCHOOL"/>
+		<result property="mSchool" column="M_SCHOOL"/>
+		<result property="hSchool" column="H_SCHOOL"/>
+		<result property="grade" column="GRADE"/>
+	</resultMap>
+
+	<insert id="addClass" parameterType="com.app.components.classlist.param.ClassAddInParam">
+		INSERT
+		INTO CLASS
+		VALUES(
+			#{className},
+			#{type}
+		)
+	</insert>
+	
+	<update id="updateClass" parameterType="com.app.components.classlist.param.ClassNameUpdateInParam">
+		UPDATE
+			CLASS
+		SET
+			NAME = #{className}
+		WHERE
+			NAME = #{originName}
+	</update>
+
+	<delete id="deleteClass">
+		DELETE
+		FROM CLASS
+		WHERE
+			NAME = #{param1}
+	</delete>
+
+	<select id="readAllNomal" resultMap="ClassDto">
+	<![CDATA[
+		SELECT
+			CLASS.NAME AS CLASS_NAME,
+			STUDENT.IDX,
+			STUDENT.NAME,
+			STUDENT.E_SCHOOL,
+			STUDENT.M_SCHOOL,
+			STUDENT.H_SCHOOL,
+			STUDENT.GRADE
+		FROM
+			CLASS LEFT JOIN STUDENT
+		ON
+			CLASS.NAME = STUDENT.CLASS_NOMAL
+		WHERE
+			CLASS.TYPE = 0 AND 
+			(STUDENT.STATUS = 1 OR STUDENT.STATUS IS NULL)
+	]]>
+		<if test='query != ""'>
+		AND
+			STUDENT.NAME LIKE CONCAT('%', #{query},'%')
+		</if>
+		ORDER BY
+			CLASS_NAME
+	</select>
+	
+	<select id="ClassCountNomal" resultType="ClassCount">
+	<![CDATA[
+		SELECT 
+			CLASS.CLASS_COUNT,
+			STUDENT_ALL.STUDENT_ALL_COUNT,
+			STUDENT_NONE.STUDENT_NONE_COUNT
+		FROM
+			(SELECT COUNT(1) AS CLASS_COUNT FROM CLASS WHERE TYPE = 0) AS CLASS,
+			(SELECT COUNT(1) AS STUDENT_ALL_COUNT FROM STUDENT WHERE STATUS = 1 ) AS STUDENT_ALL,
+			(SELECT COUNT(1) AS STUDENT_NONE_COUNT FROM STUDENT WHERE STATUS = 1 AND CLASS_NOMAL is NULL) AS STUDENT_NONE
+	]]>
+	</select>
+	
+	<select id="readClassNomalNoneStudent" resultType="ClassStudent">
+		SELECT 
+			IDX,
+			NAME,
+			E_SCHOOL,
+			M_SCHOOL,
+			H_SCHOOL,
+			GRADE
+		FROM 
+			STUDENT 
+		WHERE 
+			STATUS = 1 AND 
+			CLASS_NOMAL is NULL
+	</select>
+	
+	<update id="updateClassNomalNoneStudent">
+		UPDATE
+			STUDENT
+		SET
+			CLASS_NOMAL = null
+		WHERE
+			IDX = #{param1} AND
+			CLASS_NOMAL IS NOT NULL
+	</update>
+	
+	<update id="updateClassNomalStudent" parameterType="com.app.components.classlist.param.ClassUpdateInParam">
+		UPDATE
+			STUDENT
+		SET
+			CLASS_NOMAL = #{name}
+		WHERE
+			CLASS_NOMAL IS NULL AND 
+			(IDX IN
+			<foreach collection="idxList" index="index"  open="(" close=")" separator=",">
+            	${idxList[index]}
+        	</foreach>
+        	)
+	</update>
+	
+	
+	<select id="readAllTest" resultMap="ClassDto">
+	<![CDATA[
+		SELECT
+			CLASS.NAME AS CLASS_NAME,
+			STUDENT.IDX,
+			STUDENT.NAME,
+			STUDENT.E_SCHOOL,
+			STUDENT.M_SCHOOL,
+			STUDENT.H_SCHOOL,
+			STUDENT.GRADE
+		FROM
+			CLASS LEFT JOIN STUDENT
+		ON
+			CLASS.NAME = STUDENT.CLASS_TEST
+		WHERE
+			CLASS.TYPE = 1 AND
+			(STUDENT.STATUS = 1 OR STUDENT.STATUS IS NULL)
+	]]>
+		<if test='query != ""'>
+		AND
+			STUDENT.NAME LIKE CONCAT('%', #{query},'%')
+		</if>
+		ORDER BY
+			CLASS_NAME
+	</select>
+	
+	<select id="ClassCountTest" resultType="ClassCount">
+	<![CDATA[
+		SELECT 
+			CLASS.CLASS_COUNT,
+			STUDENT_ALL.STUDENT_ALL_COUNT,
+			STUDENT_NONE.STUDENT_NONE_COUNT
+		FROM
+			(SELECT COUNT(1) AS CLASS_COUNT FROM CLASS WHERE TYPE = 1) AS CLASS,
+			(SELECT COUNT(1) AS STUDENT_ALL_COUNT FROM STUDENT WHERE STATUS = 1 ) AS STUDENT_ALL,
+			(SELECT COUNT(1) AS STUDENT_NONE_COUNT FROM STUDENT WHERE STATUS = 1 AND CLASS_TEST is NULL) AS STUDENT_NONE
+	]]>
+	</select>
+	
+	<select id="readClassTestNoneStudent" resultType="ClassStudent">
+		SELECT 
+			IDX,
+			NAME,
+			E_SCHOOL,
+			M_SCHOOL,
+			H_SCHOOL,
+			GRADE
+		FROM 
+			STUDENT 
+		WHERE 
+			STATUS = 1 AND 
+			CLASS_TEST is NULL
+	</select>
+	
+	<update id="updateClassTestNoneStudent">
+		UPDATE
+			STUDENT
+		SET
+			CLASS_TEST = null
+		WHERE
+			IDX = #{param1} AND
+			CLASS_TEST IS NOT NULL
+	</update>
+	
+	<update id="updateClassTestStudent" parameterType="com.app.components.classlist.param.ClassUpdateInParam">
+		UPDATE
+			STUDENT
+		SET
+			CLASS_TEST = #{name}
+		WHERE
+			CLASS_TEST IS NULL AND 
+			(IDX IN
+			<foreach collection="idxList" index="index"  open="(" close=")" separator=",">
+            	${idxList[index]}
+        	</foreach>
+        	)
+	</update>
+	
+	
+	
+</mapper>

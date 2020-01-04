@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" 
+xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{layout/app_layout.html}" 
+th:with="
+title='JABIS', 
+bodyClass='animsition page-project student-edit site-navbar-small', 
+menu='#menuTeacher, #menuCounseWrite'
+">
+<th:block layout:fragment="page">
+<input type="hidden" id="studentIdx" th:value="${studentIdx}">
+<input type="hidden" id="workDate" th:value="${workDate}">
+<div id="counseCreateVue" class="page">
+
+	<div class="page-content container-fluid">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+					<div class="panel-header">
+						<h3 class="m-t-0">상담 일지 등록</h3> 
+						<div>
+							<i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>상담일지를 작성하여 등록합니다.</div> <div>
+							<i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>필수 상담 항목을 입력해야만 작성이 가능합니다.
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-8">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+					<h4 class="m-t-0"><i aria-hidden="true" class="icon fa-tag m-r-5 text-primary"></i>상세 정보</h4>
+					<div class="form-group row filter">
+		               <div class="col-md-12 col-padding">
+		               	<label class="col-form-label label-block">
+		              	 <i class="icon fa-angle-double-right m-r-5 text-primary" aria-hidden="true"></i>이름 
+		                </label>
+		                <span v-text="name"></span>
+		               </div>
+		             </div>
+		             <div class="form-group row filter">
+		               <div class="col-md-12 col-padding">
+		               	<label class="col-form-label label-block">
+		              	 <i class="icon fa-angle-double-right m-r-5 text-primary" aria-hidden="true"></i>학교 
+		                </label>
+		                <span class="m-r-10" v-text="school">송촌고등학교</span><span v-if="school != '미입력'"><span v-text="grade"></span>학년</span>
+		               </div>
+		             </div>
+		             <div class="form-group row filter">
+		               <div class="col-md-12 col-padding">
+		               	<label class="col-form-label label-block">
+		              	 <i class="icon fa-angle-double-right m-r-5 text-primary" aria-hidden="true"></i>상담일시 
+		                </label>
+		                <div class="input-group date-inline">
+	                    <span class="input-group-addon">
+	                      <i class="icon wb-calendar" aria-hidden="true"></i>
+	                    </span>
+	                    <input type="text" class="form-control" id="datepicker">
+	                  </div>
+		               </div>
+		             </div>
+					 <div class="form-group row filter">
+		               <div class="col-md-12 col-padding">
+		               	<label class="col-form-label label-block">
+		              	 <i class="icon fa-angle-double-right m-r-5 text-primary" aria-hidden="true"></i>분류 
+		                </label>
+		                <div class="inline">
+								<div class="radio-custom radio-default radio-inline">
+									<input type="radio" id="FirstMode" name="mode" value="0" v-model="mode">
+									<label for="FirstMode">입학전</label>
+								</div>
+								<div class="radio-custom radio-default radio-inline">
+									<input type="radio" id="NomalMode" name="mode" value="1" v-model="mode">
+									<label for="NomalMode">일반</label>
+								</div>
+							</div>
+		               </div>
+		             </div>
+				</div>
+			</div>
+			<div class="col-lg-4">
+				<div class="panel p-25 panel-marge mobile-height-auto p-b-5" style="height: 265.41px">
+					<h4 class="m-t-0"><i aria-hidden="true" class="icon wb-list m-r-5 text-primary"></i>상담 항목</h4>
+					<div class="m-b-5 f-s-12"><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i><span>입학전은 최초 상담만 등록 가능합니다.</span></div>
+					<div class="m-b-5 f-s-12"><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i><span>상담일시에는 실제 상담을 시행한 일시를 선택해주세요.</span></div>
+					<ul class="nav-quick nav-quick-sm row tab-ul">
+			            <li class="nav-item col-lg-4 col-4 tab-selected">
+			              <a class="nav-link" href="javascript:void(0)" v-on:click="tabSwitch(0)">
+			              <i class="icon wb-user" aria-hidden="true"></i>
+			              학생
+			              <span class="badge badge-danger">필수</span>
+			            </a>
+			            </li>
+			            <li class="nav-item col-lg-4 col-4">
+			              <a class="nav-link" href="javascript:void(0)" v-on:click="tabSwitch(1)">
+			              <i class="icon wb-tag" aria-hidden="true"></i>
+			              학부모
+			              <span class="badge badge-danger">필수</span>
+			              </a>
+			            </li>
+			            <li class="nav-item col-lg-4 col-4" v-if="mode == 0">
+			              <a class="nav-link" href="javascript:void(0)" v-on:click="tabSwitch(2)">
+			              <i class="icon wb-users" aria-hidden="true"></i>
+			              형제
+			              <span class="badge badge-success">선택</span>
+			            </a>
+						</li>
+			          </ul>
+				</div>
+			</div>
+			<div class="col-lg-12">
+				<div class="panel p-25 panel-marge mobile-height-auto" style="min-height: fit-content;">
+					<div id="init" v-show="mode == 0">
+				          <div id="studentInfo" v-show="tab == 0">
+				            <h5 class="m-t-0"><i aria-hidden="true" class="icon wb-paperclip m-r-5 text-primary"></i>장래 희망</h5>
+				          	<div class="form-group">
+					          	<input type="text" id="future" name="future" v-model="future" class="form-control" maxlength="50">
+				          	</div>
+				          	<h5 class="m-t-0"><i aria-hidden="true" class="icon wb-paperclip m-r-5 text-primary"></i>공부 방법</h5>
+				          	<div class="form-group">
+				          		<textarea id="studyStyle" name="studyStyle" v-model="studyStyle" class="maxlength-textarea form-control" data-plugin="maxlength" data-placement="bottom-right-inside"
+                      maxlength="1000" rows="6" placeholder="" style="resize: none;"></textarea>
+				          	</div>
+				          	<h5 class="m-t-0"><i aria-hidden="true" class="icon wb-paperclip m-r-5 text-primary"></i>학생 성향</h5>
+				          	<div class="form-group">
+				          		<textarea id="studentStyle" name="studentStyle" v-model="studentStyle" class="maxlength-textarea form-control" data-plugin="maxlength" data-placement="bottom-right-inside"
+                      maxlength="1000" rows="6" placeholder="" style="resize: none;"></textarea>
+				          	</div>
+				          </div>
+				          <div id="parentInfo" v-show="tab == 1">
+				            <h5 class="m-t-0"><i aria-hidden="true" class="icon wb-paperclip m-r-5 text-primary"></i>학부모 성향</h5>
+				          	<div class="form-group">
+				          		<textarea id="parentStyle" name="parentStyle" v-model="parentStyle" class="maxlength-textarea form-control" data-plugin="maxlength" data-placement="bottom-right-inside"
+                      maxlength="1000" rows="6" placeholder="" style="resize: none;"></textarea>
+				          	</div>
+				          	<h5 class="m-t-0"><i aria-hidden="true" class="icon wb-paperclip m-r-5 text-primary"></i>학부모 요청사항</h5>
+				          	<div class="form-group">
+				          		<textarea id="parentRequest" name="parentRequest" v-model="parentRequest" class="maxlength-textarea form-control" data-plugin="maxlength" data-placement="bottom-right-inside"
+                      maxlength="1000" rows="6" placeholder="" style="resize: none;"></textarea>
+				          	</div>
+				          </div>
+				          <div id="siblingInfo" v-show="tab == 2">
+				            <h5 class="m-t-0"><i aria-hidden="true" class="icon wb-paperclip m-r-5 text-primary"></i>형제 정보</h5>
+				          	<ul class="list-group list-group-dividered list-group-full">
+				                <li class="list-group-item" v-for="(item, index) in sibling">
+				                  <div class="media comment">
+				                    <div class="pr-20">
+				                      <a class="avatar avatar-online" href="javascript:void(0)">
+				                        <img width="60" height="60" alt="avatar" v-bind:avatar="item.relation">
+				                      </a>
+				                    </div>
+				                    <div class="media-body comment-body">
+				                      <a class="comment-author" v-text="item.name"></a>
+				                      <div class="comment-meta">
+				                        <span class="date">
+				                        	<span v-text="item.school" class="m-l-5"></span>
+				                        	<span v-text="item.grade"></span> 학년
+				                        </span>
+				                      </div>
+				                      <div class="comment-content">
+				                        <input class="form-control" v-bind:value="item.memo" v-model="sibling[index].memo" v-on:change="siblingModify()">
+				                      </div>
+				                    </div>
+				                  </div>
+				                </li>
+				                <li v-if="sibling.length == 0" style="list-style: none">
+				                  	<div class="text-danger">형제 정보가 없습니다.</div> 
+				                </li>
+				              </ul>
+				          </div>
+					</div>
+					
+					<div id="nomal" v-show="mode == 1">
+				          <div v-show="tab == 0">
+				            <h5 class="m-t-0"><i aria-hidden="true" class="icon wb-paperclip m-r-5 text-primary"></i>학생 상담 내용</h5>
+				          	<div class="form-group">
+				          		<textarea id="studentCounse" name="studentCounse" v-model="studentCounse" class="maxlength-textarea form-control" data-plugin="maxlength" data-placement="bottom-right-inside"
+                      maxlength="1000" rows="8" placeholder="" style="resize: none;"></textarea>
+				          	</div>
+				          	</div>
+				          <div v-show="tab == 1">
+				          	<h5 class="m-t-0"><i aria-hidden="true" class="icon wb-paperclip m-r-5 text-primary"></i>학부모 상담 내용</h5>
+				          	<div class="form-group">
+				          		<textarea id="parentCounse" name="parentCounse" v-model="parentCounse" class="maxlength-textarea form-control" data-plugin="maxlength" data-placement="bottom-right-inside"
+                      maxlength="1000" rows="8" placeholder="" style="resize: none;"></textarea>
+				          	</div>
+				          </div>
+				          <div v-show="tab == 2">
+				          	<h5 class="m-t-0"><i aria-hidden="true" class="icon wb-paperclip m-r-5 text-primary"></i>형제 정보</h5>
+				          	<ul class="list-group list-group-dividered list-group-full">
+				                <li class="list-group-item" v-for="(item, index) in sibling">
+				                  <div class="media comment">
+				                    <div class="pr-20">
+				                      <a class="avatar avatar-online" href="javascript:void(0)">
+				                        <img width="60" height="60" alt="avatar" v-bind:avatar="item.relation">
+				                      </a>
+				                    </div>
+				                    <div class="media-body comment-body">
+				                      <a class="comment-author" v-text="item.name"></a>
+				                      <div class="comment-meta">
+				                        <span class="date">
+				                        	<span v-text="item.school" class="m-l-5"></span>
+				                        	<span v-text="item.grade"></span> 학년
+				                        </span>
+				                      </div>
+				                      <div class="comment-content">
+				                        <input class="form-control" v-bind:value="item.memo" v-model="sibling[index].memo" v-on:change="siblingModify()">
+				                      </div>
+				                    </div>
+				                  </div>
+				                </li>
+				                <li v-if="sibling.length == 0" style="list-style: none">
+				                  	<div class="text-danger">형제 정보가 없습니다.</div> 
+				                </li>
+				              </ul>
+				          </div>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-12">
+				<div class="panel p-25 m-b-0">
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="media">
+								<div class="pr-20">
+									<span class="avatar avatar-online">
+									<img width="60" height="60" alt="avatar" th:attr="avatar=${member.avatar}">
+									</span>
+								</div>
+								<div class="media-body">
+									<h5 class="list-group-item-heading mt-0 mb-5" th:text="${member.name}">
+									</h5>
+									<p class="list-group-item-text" v-text="today">
+									</p>
+								</div>
+							</div>
+							<button id="studentCreateButton" type="button" class="action-btn btn btn-primary m-r-5" v-text="btnText" v-on:click="submitAction()"></button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+</th:block>
+
+<th:block layout:fragment="vuejs">
+	<script th:attr="src=@{'/js/vue/counseCreateVue.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customScript">
+	<script th:attr="src=@{'/js/custom/counse-create.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customStyle">
+	<link rel="stylesheet" th:attr="href=@{'/css/custom/counse-create.css?ver=' + ${@environment.getProperty('app.version')}}">
+</th:block>
+</html>

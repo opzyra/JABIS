@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.components.board.data.BoardDao">
+	
+	<resultMap type="BoardResultMap" id="Board">
+		<id property="email" column="EMAIL"/>
+		<result property="name" column="NAME"/>
+		<result property="profileImg" column="PROFILE_IMG"/>
+		<result property="idx" column="IDX"/>
+		<result property="importent" column="IMPORTENT"/>
+		<result property="title" column="TITLE"/>
+		<result property="writeDate" column="WRITE_DATE"/>
+		<result property="viewCount" column="VIEW_COUNT"/>
+	</resultMap>
+	
+	<insert id="createOne" parameterType="com.app.components.board.data.BoardEntity">
+		INSERT 
+		INTO BOARD(
+			EMAIL, 
+			CATEGORY_CODE, 
+			TITLE, 
+			CONTENTS, 
+			AUTH_LEVEL
+		)
+		VALUES(
+			#{email},
+			#{categoryCode},
+			#{title},
+			#{contents},
+			#{authLevel}
+		)
+	</insert>
+	
+	<update id="updateOne" parameterType="com.app.components.board.data.BoardEntity">
+		UPDATE
+			BOARD 
+		SET
+			TITLE = #{title},
+			CONTENTS = #{contents},
+			AUTH_LEVEL = #{authLevel}
+		WHERE
+			IDX = #{idx} AND
+			EMAIL = #{email}
+	</update>
+	
+	<update id="deleteOne">
+		UPDATE
+			BOARD
+		SET
+			DELETE_DATE = CURRENT_TIMESTAMP,
+			DELETE_STATUS = 1
+		WHERE
+			IDX = #{param1}
+		<if test="param2 != null">
+			 AND EMAIL = #{param2}
+		</if>
+	</update>
+	
+	<update id="updateViewCount" parameterType="Integer">
+		UPDATE
+			BOARD
+		SET
+			VIEW_COUNT = VIEW_COUNT+1
+		WHERE
+			IDX = #{param1}	
+	</update>
+	
+	<update id="updateCommentsCount" parameterType="Integer">
+		UPDATE
+			BOARD
+		SET
+			COMMENTS_COUNT = COMMENTS_COUNT + #{param2}
+		WHERE
+			IDX = #{param1}	
+	</update>
+	
+	<!-- JOIN QUERY -->
+		
+	<select id="read" resultMap="Board" parameterType="com.app.components.board.param.RecordInParam">
+		<![CDATA[
+		SELECT
+			MEMBER.EMAIL,
+			MEMBER.NAME,
+			MEMBER.AVATAR,
+			BOARD.IDX,
+			BOARD.IMPORTENT,
+			BOARD.TITLE,
+			BOARD.WRITE_DATE,
+			BOARD.VIEW_COUNT,
+			BOARD.COMMENTS_COUNT,
+			BOARD.AUTH_LEVEL
+		FROM
+			BOARD LEFT JOIN MEMBER
+		ON
+			BOARD.EMAIL = MEMBER.EMAIL				
+		WHERE 
+			BOARD.CATEGORY_CODE = #{categoryCode}
+		AND
+			BOARD.DELETE_STATUS = 0
+		AND
+			BOARD.AUTH_LEVEL <= #{roleCode}
+		]]>
+		<if test='query != null'>
+		AND
+			BOARD.TITLE LIKE CONCAT('%', #{query},'%')
+		</if>
+		ORDER BY 
+		<choose>
+			<when test='order == "desc"'>
+			BOARD.IDX DESC
+			</when>
+			<when test='order == "commentsCount"'>
+			BOARD.COMMENTS_COUNT DESC
+			</when>
+			<when test='order == "viewCount"'>
+			BOARD.VIEW_COUNT DESC
+			</when>
+		</choose>
+		LIMIT #{offset}, #{limit};
+	</select>
+	
+	<select id="readLatest" parameterType="com.app.components.board.param.NoticeLatestInParam" resultType="BoardResultMap">
+	<![CDATA[
+		SELECT
+			MEMBER.EMAIL,
+			MEMBER.NAME,
+			MEMBER.AVATAR,
+			BOARD.IDX,
+			BOARD.IMPORTENT,
+			BOARD.TITLE,
+			BOARD.WRITE_DATE,
+			BOARD.VIEW_COUNT,
+			BOARD.COMMENTS_COUNT,
+			BOARD.AUTH_LEVEL
+		FROM
+			BOARD LEFT JOIN MEMBER
+		ON
+			BOARD.EMAIL = MEMBER.EMAIL		
+		WHERE
+			BOARD.CATEGORY_CODE = 0 AND
+			BOARD.DELETE_STATUS = 0 AND
+			BOARD.AUTH_LEVEL <= #{roleCode}
+		ORDER BY
+			BOARD.IDX DESC
+		LIMIT 5
+	]]>
+	</select>
+	
+	<select id="count" resultType="Integer" parameterType="com.app.components.board.param.RecordInParam">
+	<![CDATA[
+		SELECT
+			COUNT(1)
+		FROM
+			BOARD			
+		WHERE 
+			BOARD.CATEGORY_CODE = #{categoryCode}
+		AND
+			BOARD.DELETE_STATUS = 0
+		AND
+			BOARD.AUTH_LEVEL <= #{roleCode}
+		]]>
+		<if test='query != ""'>
+		AND
+			BOARD.TITLE LIKE CONCAT('%', #{query},'%')
+		</if>
+	</select>
+	
+	<select id="readOne" resultType="BoardResultMap" parameterType="Integer">
+		SELECT
+			MEMBER.EMAIL,
+			MEMBER.NAME,
+			MEMBER.AVATAR,
+			BOARD.IDX,
+			BOARD.CATEGORY_CODE,
+			BOARD.IMPORTENT,
+			BOARD.TITLE,
+			BOARD.CONTENTS,
+			BOARD.WRITE_DATE,
+			BOARD.VIEW_COUNT,
+			BOARD.COMMENTS_COUNT,
+			BOARD.AUTH_LEVEL
+		FROM
+			BOARD LEFT JOIN MEMBER
+		ON
+			BOARD.EMAIL = MEMBER.EMAIL				
+		WHERE
+			BOARD.IDX = #{param1} AND
+			BOARD.DELETE_STATUS = 0
+	</select>
+	
+	
+
+</mapper>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<meta charset="utf-8">
+<div class="site-menubar site-menubar-light" th:fragment="menubarFragment" layout:fragment="menubar">
+	<div class="site-menubar-body">
+        <div>
+          <div>
+            <ul class="site-menu" data-plugin="menu">
+              <li class="site-menu-item has-sub" id="menuHome">
+                <a href="/app/" data-dropdown-toggle="false">
+                  <i class="site-menu-icon wb-home" aria-hidden="true"></i>
+                  <span class="site-menu-title">Home</span>
+                </a>
+              </li>
+              <li class="site-menu-item has-sub" id="menuNotice">
+                <a href="/app/notice" data-dropdown-toggle="false">
+                  <i class="site-menu-icon wb-chat-working" aria-hidden="true"></i>
+                  <span class="site-menu-title">Notice</span>
+                </a>
+              </li>
+              <li class="site-menu-item has-sub" id="menuStudent">
+                <a href="javascript:void(0)" data-dropdown-toggle="false">
+                  <i class="site-menu-icon wb-users" aria-hidden="true"></i>
+                  <span class="site-menu-title">Student</span>
+                  <span class="site-menu-arrow"></span>
+                </a>
+                <ul class="site-menu-sub">
+                  <li class="site-menu-item" id="menuStudentList">
+                    <a href="/app/student/list">
+                      <span class="site-menu-title">학생 명부</span>
+                    </a>
+                  </li>
+                  <li class="site-menu-item" id="menuSiblingList">
+                    <a href="/app/sibling">
+                      <span class="site-menu-title">형제 현황</span>
+                    </a>
+                  </li>
+                  <li class="site-menu-item" id="menuScore">
+                    <a href="/app/score?studentIdx=&mode=0">
+                      <span class="site-menu-title">성적 열람</span>
+                    </a>
+                  </li>
+                  
+                  <li class="site-menu-item" id="menuCounse">
+                    <a href="/app/counse">
+                      <span class="site-menu-title">상담 열람</span>
+                    </a>
+                  </li>
+                  
+                </ul>
+              </li>
+              <li class="site-menu-item has-sub" id="menuTeacher">
+                <a href="javascript:void(0)" data-dropdown-toggle="false">
+                  <i class="site-menu-icon wb-text" aria-hidden="true"></i>
+                  <span class="site-menu-title">Teacher</span>
+                  <span class="site-menu-arrow"></span>
+                </a>
+                <ul class="site-menu-sub">
+                  <li class="site-menu-item" id="menuCounseWrite">
+                    <a href="/app/work">
+                      <span class="site-menu-title">상담 작성</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li class="site-menu-item has-sub" id="menuData">
+                <a href="javascript:void(0)" data-dropdown-toggle="false">
+                  <i class="site-menu-icon wb-pie-chart" aria-hidden="true"></i>
+                  <span class="site-menu-title">Data</span>
+                  <span class="site-menu-arrow"></span>
+                </a>
+                <ul class="site-menu-sub">
+                  <li class="site-menu-item" id="menuTeacherList">
+                    <a href="/app/data/counse">
+                      <span class="site-menu-title">상담 현황</span>
+                    </a>
+                  </li>
+                  <li class="site-menu-item" id="menuLeave">
+                    <a href="/app/data/leave">
+                      <span class="site-menu-title">휴원 현황</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li class="site-menu-item has-sub" id="menuConfig">
+                <a href="javascript:void(0)" data-dropdown-toggle="false">
+                  <i class="site-menu-icon wb-settings" aria-hidden="true"></i>
+                  <span class="site-menu-title">System</span>
+                  <span class="site-menu-arrow"></span>
+                </a>
+                <ul class="site-menu-sub">
+                  <li class="site-menu-item" id="menuClassSet">
+                    <a href="/app/class/list">
+                      <span class="site-menu-title">반 편성</span>
+                    </a>
+                  </li>
+                  <li class="site-menu-item" id="menuHrt">
+                    <a href="/app/hrt/list">
+                      <span class="site-menu-title">담임 배정</span>
+                    </a>
+                  </li>
+                  <li class="site-menu-item" id="menuSubject">
+                    <a href="/app/subject">
+                      <span class="site-menu-title">과목 설정</span>
+                    </a>
+                  </li>
+                  <li class="site-menu-item" id="menuMember">
+                    <a href="/app/member/list">
+                      <span class="site-menu-title">계정 관리</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              
+            </ul>      
+          </div>
+        </div>
+      </div>
+</div>
+</html>

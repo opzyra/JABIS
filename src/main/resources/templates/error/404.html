@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout/login_layout.html}"
+  th:with="
+  title='JABIS',
+  bodyClass='animsition page-error page-error-404 layout-full'
+  ">
+    <div layout:fragment="page" class="page vertical-align text-center" data-animsition-in="fade-in" data-animsition-out="fade-out">
+      <div class="page-content vertical-align-middle">
+        <header>
+          <h1 class="animation-slide-top">404</h1>
+          <p>페이지를 찾을 수 없습니다.</p>
+        </header>
+        <p class="error-advise">URL을 확인해 주세요.</p>
+        <a class="btn btn-primary btn-round" href="javascript:history.back()">이전화면</a>
+
+        <footer th:replace="fragments/login/footer::footerFragment"></footer>
+      </div>
+    </div>
+    
+    <th:block layout:fragment="customScript">
+    </th:block>
+    
+    <th:block layout:fragment="customStyle">
+    <link rel="stylesheet" href="/css/custom/errors.css">
+	</th:block>
+</html>

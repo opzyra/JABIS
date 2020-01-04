@@ -1,0 +1,173 @@
+.panel-header-help {
+    text-align: right;
+    margin-top: 22px;
+}
+.panel-header {
+    padding: 0px 10px;
+}
+.bootstrap-select .dropdown-toggle{
+	background-color: white !important;
+}
+.app-forum .page-content .table {
+  table-layout: fixed; }
+  .app-forum .page-content .table .content {
+    position: relative; }
+    .app-forum .page-content .table .content > * {
+      overflow: hidden;
+      text-overflow: ellipsis;
+       }
+  .app-forum .page-content .table .flags {
+    display: inline-block; }
+  .app-forum .page-content .table a {
+    text-decoration: none; }
+  .app-forum .page-content .table .title {
+    line-height: 25px; }
+    .app-forum .page-content .table .title > * {
+       }
+    .app-forum .page-content .table .title .locked {
+      color: #a3afb7; }
+  .app-forum .page-content .table .sticky-top {
+    font-size: 90%; }
+    .app-forum .page-content .table .sticky-top .icon {
+      margin-right: 4px; }
+  .app-forum .page-content .table .metas {
+    color: #a3afb7; }
+    .app-forum .page-content .table .metas > span {
+      position: relative;
+      margin-right: 10px; }
+      .app-forum .page-content .table .metas > span + span:before {
+        content: "";
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        top: 50%;
+        left: -8px;
+        background-color: #a7b0b8; }
+  .app-forum .page-content .table .forum-posts {
+    text-align: right; }
+
+.app-forum .slidePanel-header {
+  background-color: #6da611; }
+  .app-forum .slidePanel-header::after {
+    display: block;
+    clear: both;
+    content: ""; }
+
+.app-forum .slidePanel .actions-top {
+  position: absolute;
+  top: 30px;
+  right: 20px; }
+
+.app-forum .slidePanel .actions-bottom {
+  position: absolute;
+  bottom: 30px;
+  right: 20px; }
+
+.app-forum .slidePanel .avatar, .app-forum .slidePanel .name {
+  margin-right: 6px; }
+
+.app-forum .slidePanel .time {
+  color: #a3afb7; }
+
+.app-forum .slidePanel .forum-header, .app-forum .slidePanel .forum-content, .app-forum .slidePanel .forum-metas {
+  margin-bottom: 20px; }
+  .app-forum .slidePanel .forum-header::after, .app-forum .slidePanel .forum-content::after, .app-forum .slidePanel .forum-metas::after {
+    display: block;
+    clear: both;
+    content: ""; }
+
+.app-forum .slidePanel .forum-content:last-child {
+  margin-bottom: 0; }
+
+.app-forum .slidePanel .tags {
+  margin-bottom: 15px; }
+.tags {
+  margin-left:5px;	
+}
+.panel-white{
+	background-color: white !important;
+}
+@media (max-width: 1199.98px) {
+  .app-forum .page-content .table .content {
+    padding-right: 100px; }
+  .app-forum .page-content .table .flags {
+    position: absolute;
+    top: 0;
+    right: 0; } }
+
+@media (max-width: 479.98px) {
+  .app-forum .nav-tabs-line > li > a {
+    padding: 10px; }
+  .app-forum .responsive-hide {
+    display: none !important; }
+  .app-forum .page-content .table .content {
+    padding-right: 0; } }
+
+  @media (min-width: 1600px) {
+    .app-forum .page {
+      max-width: 1600px; } }
+  @media (min-width: 1200px) and (max-width: 1599.98px) {
+    .app-forum .page {
+      max-width: 1140px; } }
+  @media (min-width: 992px) and (max-width: 1199.98px) {
+    .app-forum .page {
+      max-width: 932px; } }
+  @media (min-width: 768px) and (max-width: 991.98px) {
+    .app-forum .page {
+      max-width: 708px; } }
+  @media (max-width: 767.98px) {
+    .app-forum .page {
+      margin: 0; } }
+
+.page-edit{
+  margin-top: 20px;
+}
+.bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn) {
+    width: 100%
+}
+.note-editor {
+	position: relative;
+}
+@media (max-width: 479.98px){
+.media {
+    -ms-flex-direction: inherit;
+    flex-direction: inherit;
+}
+
+}
+@media (max-width: 768px){
+.panel-header {
+    padding: 0px 0px;
+}
+.mobile-filter{
+	display: inline;
+}
+.mobile-filter-none{
+	display: inline;
+}
+.filter-box {
+	display: none;
+}
+.page-content {
+    padding: 0px;
+}
+
+.panel>.table-responsive .table>tbody>tr>td:first-child, .panel>.table-responsive .table>tbody>tr>th:first-child, .panel>.table-responsive .table>tfoot>tr>td:first-child, .panel>.table-responsive .table>tfoot>tr>th:first-child, .panel>.table-responsive .table>thead>tr>td:first-child, .panel>.table-responsive .table>thead>tr>th:first-child, .panel>.table-responsive .table>tr>td:first-child, .panel>.table-responsive .table>tr>th:first-child, .panel>.table>tbody>tr>td:first-child, .panel>.table>tbody>tr>th:first-child, .panel>.table>tfoot>tr>td:first-child, .panel>.table>tfoot>tr>th:first-child, .panel>.table>thead>tr>td:first-child, .panel>.table>thead>tr>th:first-child, .panel>.table>tr>td:first-child, .panel>.table>tr>th:first-child {
+    padding-left: 5px;
+}
+.panel>.table-responsive .table>tbody>tr>td:last-child, .panel>.table-responsive .table>tbody>tr>th:last-child, .panel>.table-responsive .table>tfoot>tr>td:last-child, .panel>.table-responsive .table>tfoot>tr>th:last-child, .panel>.table-responsive .table>thead>tr>td:last-child, .panel>.table-responsive .table>thead>tr>th:last-child, .panel>.table-responsive .table>tr>td:last-child, .panel>.table-responsive .table>tr>th:last-child, .panel>.table>tbody>tr>td:last-child, .panel>.table>tbody>tr>th:last-child, .panel>.table>tfoot>tr>td:last-child, .panel>.table>tfoot>tr>th:last-child, .panel>.table>thead>tr>td:last-child, .panel>.table>thead>tr>th:last-child, .panel>.table>tr>td:last-child, .panel>.table>tr>th:last-child {
+    padding-right: 5px;
+}
+.mobile-table {
+	padding: 10px !important;
+}
+.menu-height-auto {
+    height: 60px !important;
+    min-height: fit-content;
+    padding-top: 10px !important;
+}
+.counse-menu{
+	    height: auto !important;
+}
+}
+

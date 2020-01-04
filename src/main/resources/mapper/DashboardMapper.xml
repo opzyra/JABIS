@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.components.dashboard.data.DashboardDao">
+
+	<select id="readCount" resultType="InforCountDto">
+	<![CDATA[
+		SELECT 
+			STUDENT.STUDENT_COUNT,
+			MEMBER.TEACHER_COUNT
+		FROM
+			(SELECT COUNT(1) AS STUDENT_COUNT FROM STUDENT WHERE STATUS = 1 ) AS STUDENT,
+			(SELECT COUNT(1) AS TEACHER_COUNT FROM MEMBER WHERE ROLE_CODE >= 1 AND ROLE_CODE <= 3 AND ENABLED_CODE = 0 AND DELETE_STATUS = 0 ) AS MEMBER
+	]]>
+	</select>
+
+</mapper>

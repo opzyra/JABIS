@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.components.data.data.DataDao">
+
+	<select id="readTeacher" resultType="TeacherDto" parameterType="com.app.components.data.param.TeacherReadInParam">
+	<![CDATA[
+		SELECT
+			EMAIL,
+			NAME,
+			ROLE_CODE,
+			SUBJECT_CODE,
+			PHONE,
+			ACCESS_LAST_DATE,
+			IFNULL((SELECT STUDENT_COUNT FROM COUNSE_MONTH WHERE EMAIL = MEMBER.EMAIL AND YEAR = YEAR(#{end}) AND MONTH = MONTH(#{end})), (SELECT COUNT(1) FROM STUDENT WHERE HRT_EMAIL = MEMBER.EMAIL)) AS HRT_COUNT,
+			(SELECT COUNT(1) FROM STUDENT LEFT JOIN COUNSE
+			ON
+			STUDENT.IDX = COUNSE.STUDENT_IDX
+			WHERE
+			STUDENT.HRT_EMAIL = MEMBER.EMAIL AND
+			STUDENT.STATUS = 1 AND
+			COUNSE.WRITE_DATE = DATE(NOW())) AS COUNSE_COUNT,
+			(SELECT COUNT(DISTINCT STUDENT.IDX)
+			FROM STUDENT LEFT OUTER JOIN COUNSE
+			ON STUDENT.IDX = COUNSE.STUDENT_IDX
+			WHERE STUDENT.HRT_EMAIL = MEMBER.EMAIL AND
+			STUDENT.STATUS = 1 AND
+			WRITE_DATE >= #{start} AND WRITE_DATE <= #{end} AND COUNSE_DATE >= #{start} AND COUNSE_DATE <= #{end}) AS MONTH_COUNT
+		FROM
+			MEMBER
+		WHERE
+			DELETE_STATUS = 0 AND
+			ENABLED_CODE = 0 AND
+			ROLE_CODE < 5 AND
+			ROLE_CODE > 0
+		ORDER BY
+			NAME
+	]]>
+	</select>
+	
+	<select id="readStudentCount" resultType="StudentCountDto">
+	<![CDATA[
+		SELECT 
+			EMAIL,
+			YEAR(NOW()) AS YEAR,
+			MONTH(NOW()) AS MONTH,
+			(SELECT COUNT(1) FROM STUDENT WHERE HRT_EMAIL = MEMBER.EMAIL) AS STUDENT_COUNT 
+		FROM MEMBER
+		WHERE
+			MEMBER.DELETE_STATUS = 0 AND MEMBER.ENABLED_CODE = 0 AND MEMBER.ROLE_CODE > 0 AND MEMBER.ROLE_CODE < 5
+	]]>
+	</select>
+	
+	<insert id="createMonthCount" parameterType="com.app.components.data.data.StudentCountDto">
+		INSERT INTO
+			COUNSE_MONTH
+		VALUES(
+			#{email},
+			#{year},
+			#{month},
+			#{studentCount}
+		)
+	</insert>
+
+</mapper>

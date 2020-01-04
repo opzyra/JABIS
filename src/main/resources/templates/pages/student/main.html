@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" 
+xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{layout/app_layout.html}" 
+th:with="
+title='JABIS', 
+bodyClass='animsition page-project student-list site-navbar-small',  
+menu='#menuStudent, #menuStudentList'
+">
+
+<th:block layout:fragment="page">
+<input type="hidden" id="schoolParam" th:value="${school}">
+<input type="hidden" id="statusParam" th:value="${status}">
+<input type="hidden" id="gradeParam" th:value="${grade}">
+<input type="hidden" id="classNameParam" th:value="${className}">
+<input type="hidden" id="hrtParam" th:value="${hrt}">
+<input type="hidden" id="testParam" th:value="${test}">
+<div id="studentVue" class="page">
+
+	<div class="page-content container-fluid">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+					<div class="row">
+						<div class="col-lg-6 p-0">
+							<div class="panel-header">
+								<h3 class="m-t-0">
+									학생 명부
+									<span class="mobile-filter m-l-5"><i class="icon fa-filter" aria-hidden="true"></i></span>
+									<span sec:authorize="hasAnyAuthority('ROLE_WEB', 'ROLE_ADMIN', 'ROLE_MASTER')" class="mobile-filter-none" onclick="location.href='/app/student/create'"><i aria-hidden="true" class="icon wb-user-add m-r-5"></i></span>
+								</h3> 
+								<div>
+									<i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>등록된 학생 명단 입니다.</div> <div>
+									<i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>학생 개인에 대한 정보는 <i aria-hidden="true" class="icon wb-zoom-in text-primary"></i> 버튼을 클릭해주세요.</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-6">
+							<ul class="panel-info">
+					            <li>
+					              <div class="num black-600" v-text="allCount"></div>
+					              <a class="status-link link" href="/app/student/list" v-bind:class="{ statusSelected: isActive.all }">전체</a>
+					            </li>
+					            <li>
+					              <div class="num green-600" v-text="standbyCount"></div>
+					              <a class="status-link link" href="/app/student/list?status=0" v-bind:class="{ statusSelected: isActive.standby }">입학예정</a>
+					            </li>
+					            <li>
+					              <div class="num blue-600" v-text="nowCount"></div>
+					              <a class="status-link link" href="/app/student/list?status=1" v-bind:class="{ statusSelected: isActive.now }">재원</a>
+					            </li>
+					            <li>
+					              <div class="num red-600" v-text="deletedCount"></div>
+					              <a class="status-link link" href="/app/student/list?status=2" v-bind:class="{ statusSelected: isActive.deleted }">결원</a>
+					            </li>
+					            <li>
+					              <div class="num orange-600" v-text="breakCount"></div>
+					              <a class="status-link link" href="/app/student/list?status=3" v-bind:class="{ statusSelected: isActive.breaks }">휴원</a>
+					            </li>
+					          </ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-8 filter-box" id="filterBox">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+				<h4 class="m-t-0"><i aria-hidden="true" class="icon fa-filter m-r-5 text-primary"></i>검색 필터링</h4>
+	        	<div class="form-group row filter">
+	               <div class="col-md-12 col-padding">
+	               	<label class="col-form-label label-block">
+	              	 <i class="icon fa-angle-double-right m-r-5 text-primary" aria-hidden="true"></i>학교별 검색 
+	                </label>
+	                 <select id="schools" name="schools" class="form-control form-control-inline schools" v-model="school">
+						<option v-for="item in schools" v-bind:value="item" v-text="item"></option>
+					</select>
+					<select id="grade" name="grade" class="form-control form-control-inline grade" v-model="grade">
+						<option value="0">전체</option>
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+						<option value="4">4</option>
+						<option value="5">5</option>
+						<option value="6">6</option>
+					</select>
+					<button v-on:click="schoolFilter()"type="button" class="btn btn-icon btn-default btn-outline"><i class="icon fa-filter" aria-hidden="true"></i></button>
+	               </div>
+	             </div>
+	             <div class="form-group row filter">
+	               <div class="col-md-12 col-padding hrt-select">
+	               	<label class="col-form-label label-block">
+	              	 <i class="icon fa-angle-double-right m-r-5 text-primary" aria-hidden="true"></i>담임별 검색 
+	                </label>
+	                 <select id="hrts" name="hrts" class="form-control form-control-inline schools" v-model="hrt">
+						<option v-for="item in hrts" v-bind:value="item" v-text="item"></option>
+					</select>
+					<button v-on:click="hrtFilter()" type="button" class="btn btn-icon btn-default btn-outline"><i class="icon fa-filter" aria-hidden="true"></i></button>
+	               </div>
+	             </div>
+	             <div class="form-group row filter">
+	               <div class="col-md-12 col-padding">
+	               	<label class="col-form-label label-block class-Filter">
+	              	 <i class="icon fa-angle-double-right m-r-5 text-primary" aria-hidden="true"></i>반별 검색 
+	                </label>
+	                 <select id="classNames" name="classNames" class="form-control form-control-inline schools" v-model="className">
+	                 	<optgroup class="group" label="일반">
+	                 		<option value="미배정일">미배정</option>
+	                 		<option v-for="item in classNomal" v-bind:value="item" v-text="item"></option>
+	                 	</optgroup>
+						<optgroup class="group" label="시험기간">
+							<option value="미배정시">미배정</option>
+							<option v-for="item in classTest" v-bind:value="item" v-text="item"></option>
+						</optgroup>
+					</select>
+					<button v-on:click="classFilter()" type="button" class="btn btn-icon btn-default btn-outline"><i class="icon fa-filter" aria-hidden="true"></i></button>
+	               </div>
+	             </div>
+	             
+	             <div class="form-group row filter">
+	               <div class="col-md-12 col-padding">
+	               	<label class="col-form-label label-block class-Filter">
+	              	 <i class="icon fa-angle-double-right m-r-5 text-primary" aria-hidden="true"></i>추가 설정 
+	                </label>
+	                <div class="inline-block m-r-20">
+	                    <div class="float-left mr-10">
+	                      <input type="checkbox" id="testClass" name="testClass"
+	                        data-plugin="switchery" />
+	                    </div>
+	                    <label class="pt-3" for="testClass">시험기간 반편성</label>
+	                  </div>
+					<div class="inline-block">
+	                    <div class="float-left mr-10">
+	                      <input type="checkbox" id="parentPhone" name="parentPhone"
+	                        data-plugin="switchery" data-color="#9463f7"/>
+	                    </div>
+	                    <label class="pt-3" for="parentPhone">부모 연락처</label>
+	                  </div>
+	               </div>
+	             </div>
+				</div>
+			</div>
+			<div class="col-lg-4 filter-box">
+				<div class="panel p-25 panel-marge mobile-p-b-0" style="height: 270.74px;">
+					<h4 class="m-t-0"><i aria-hidden="true" class="icon wb-menu m-r-5 text-primary"></i>메뉴</h4>
+					<button sec:authorize="hasAnyAuthority('ROLE_WEB', 'ROLE_ADMIN', 'ROLE_MASTER', 'ROLE_TEAM')" type="button" class="btn btn-icon btn-block btn-primary btn-outline" onclick="location.href='/app/student/create'"><i aria-hidden="true" class="icon wb-user-add m-r-5"></i>학생 등록</button>
+					<button type="button" class="btn btn-icon btn-block btn-primary btn-outline" v-on:click="printList()"><i aria-hidden="true" class="icon wb-print m-r-5"></i>화면 출력</button>
+					<button sec:authorize="hasAnyAuthority('ROLE_WEB','ROLE_ADMIN', 'ROLE_MASTER')" type="button" class="btn btn-icon btn-block btn-primary btn-outline" v-on:click="printExcel()"><i aria-hidden="true" class="icon fa-file-excel-o m-r-5"></i>엑셀 파일 저장</button>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="panel p-30 mobile-height-auto mobile-table m-b-0" style="height: 1380px">
+					<div id="loadingBar" class="loading-bar">
+				      <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+				    </div>
+					<table class="table table-hover toggle-circle" id="studentList"
+                  data-paging="true" data-filtering="true" data-sorting="true" data-paging-size="30">
+                  <thead>
+                    <tr>
+                      <th data-name="name" class="table-name">이름</th>
+                      <th data-name="status" class="table-status">상태</th>
+                      <th data-name="school" class="table-school">학교</th>
+                      <th data-name="grade" class="table-grade">학년</th>
+                      <th data-name="className" data-breakpoints="xs sm md">반 편성</th>
+                      <th data-name="hrtName" data-breakpoints="xs sm md" class="table-hrtName">담임</th>
+                      <th data-name="phone" data-type="date" data-breakpoints="xs sm md" class="table-phone">연락처</th>
+                      <th data-name="address" data-type="date" data-breakpoints="xs sm md" class="table-address">주소</th>
+                      <th data-name="more" class="text-center">정보</th>
+                    </tr>
+                  </thead>
+                </table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+</th:block>
+
+<th:block layout:fragment="vuejs">
+	<script th:attr="src=@{'/js/vue/studentVue.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customScript">
+	<script th:attr="src=@{'/js/custom/student.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customStyle">
+	<link rel="stylesheet" th:attr="href=@{'/css/custom/student.css?ver=' + ${@environment.getProperty('app.version')}}">
+</th:block>
+
+</html>

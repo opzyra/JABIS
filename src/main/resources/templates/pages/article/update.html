@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" 
+xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{layout/app_layout.html}" 
+th:with="
+title='JABIS', 
+bodyClass='animsition app-forum site-navbar-small',
+menu='#menuNotice'
+">
+<th:block layout:fragment="page">
+<div id="articleModifyVue" class="page">
+	<form id="articleModifyForm">
+	<div class="page-content container-fluid">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+					<div class="row">
+						<div class="col-lg-7">
+							<div class="panel-header">
+								<h3 class="m-t-0">공지사항 수정</h3> 
+								<div><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>등록된 공지사항 게시글을 수정합니다.</div> 
+								<div><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>열람 제한을 설정하면 계정의 권한에 따라 게시글을 확인할 수 있습니다.</div>
+							</div>	
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-12">
+				<div class="panel p-25 panel-marge mobile-p-b-10">
+					<div class="form-group">
+						<label class="form-control-label" for="inputBasicEmail">게시글 제목</label>
+						<input type="text" class="form-control" id="title" name="title" placeholder="제목을 입력해주세요." v-model="title" th:value="${board.title}">
+					</div>
+					<div class="form-group">
+						<label class="form-control-label" for="inputBasicEmail">열람 제한 권한</label>
+						<div>
+							<select title="해당 직책 이상만 열람할 수 있습니다." id="authLevel" name="authLevel" v-model="authLevel" th:attr="data=${board.authLevel}">
+								<option value="0">전체 공개</option>
+								<option value="1">담임 이상</option>
+								<option value="2">팀장 이상</option>
+								<option value="3">실장</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group m-t-30">
+						<div id="contents" name="contents" v-model="contents" th:utext="${board.contents}"></div>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-12">
+				<div class="panel p-25 m-b-0">
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="media">
+								<div class="pr-20">
+									<span class="avatar avatar-online">
+									<img width="60" height="60" alt="avatar" th:attr="avatar=${member.avatar}">
+									</span>
+								</div>
+								<div class="media-body">
+									<h5 class="list-group-item-heading mt-0 mb-5" th:text="${member.name}">
+									</h5>
+									<p class="list-group-item-text" th:text="${#dates.format(member.regDate, 'yyyy.MM.dd HH:mm:ss')}">
+									</p>
+								</div>
+							</div>
+							<button id="articleEditButton" type="submit" class="action-btn btn btn-primary m-r-5">수정</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+	</form>
+</div>
+</th:block>
+
+<th:block layout:fragment="vuejs">
+	<script th:attr="src=@{'/js/vue/articleModifyVue.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customScript">
+	<script th:attr="src=@{'/vendor/summernote/summernote.min.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+	<script th:attr="src=@{'/vendor/summernote/summernote-ko-KR.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+	<script th:attr="src=@{'/js/common/Plugin/summernote.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+	<script th:attr="src=@{'/js/custom/editor-summernote.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+	<script>
+		$("#authLevel").selectpicker({
+			style: 'btn-select',
+	        iconBase: 'icon',
+	        tickIcon: 'wb-check',
+		});
+		$("#authLevel").selectpicker('val', $('#authLevel').attr('data'));
+		$("#authLevel").selectpicker('render');
+	</script>
+</th:block>
+
+<th:block layout:fragment="customStyle">
+	<link rel="stylesheet" th:attr="href=@{'/css/custom/article.css?ver=' + ${@environment.getProperty('app.version')}}">
+</th:block>
+
+</html>

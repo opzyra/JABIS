@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.components.member.data.MemberDao">
+
+	<select id="readOne" resultType="MemberEntity" parameterType="String">
+		SELECT
+			*
+		FROM
+			MEMBER
+		WHERE
+			MEMBER.EMAIL = #{param1}
+	</select>
+	
+	<insert id="createOne" parameterType="MemberEntity">
+		INSERT
+		INTO MEMBER(
+			NAME,
+			EMAIL,
+			PASSWORD,
+			ENABLED_CODE,
+			PHONE,
+			AUTH_STR
+		)
+		VALUES(
+			#{name},
+			#{email},
+			#{password},
+			1,
+			#{phone},
+			#{authStr}
+		)
+	</insert>
+	
+	<update id="authMember">
+		UPDATE 
+			MEMBER 
+		SET 
+			ENABLED_CODE = 0 
+		WHERE 
+			EMAIL = #{param1} AND 
+			AUTH_STR = #{param2}
+	</update>
+	
+	<update id="accessSuccessMember">
+		UPDATE 
+			MEMBER
+		SET
+			ACCESS_LAST_DATE = CURRENT_TIMESTAMP,
+			ACCESS_TRY_COUNT = 0
+		WHERE
+			EMAIL = #{param1}
+	</update>
+	
+	<update id="accessFailMember">
+		UPDATE 
+			MEMBER
+		SET
+			ACCESS_TRY_COUNT = ACCESS_TRY_COUNT+1
+		WHERE
+			EMAIL = #{param1}
+	</update>
+	
+	<select id="readTeacher" resultType="MemberEntity" parameterType="String">
+	<![CDATA[
+		SELECT
+			NAME,
+			ROLE_CODE,
+			SUBJECT_CODE,
+			PHONE
+		FROM
+			MEMBER
+		WHERE
+			DELETE_STATUS = 0 AND
+			ENABLED_CODE = 0 AND
+			ROLE_CODE < 4
+		ORDER BY
+			NAME
+	]]>
+	</select>
+	
+	<select id="countAll" resultType="com.app.components.member.param.CountOutParam" >
+	<![CDATA[
+		SELECT 
+			COUNT(if(ROLE_CODE = 5 || DELETE_STATUS = 1, null, 1)) AS ALL_COUNT,
+			COUNT(if(ENABLED_CODE = 0 && ROLE_CODE < 5 && DELETE_STATUS = 0, 0, null)) AS AUTH_COUNT,
+			COUNT(if(ENABLED_CODE = 1 && DELETE_STATUS = 0, 1, null)) AS READY_COUNT,
+			COUNT(if(ENABLED_CODE = 2 && DELETE_STATUS = 0, 2, null)) AS BAN_COUNT,
+			COUNT(if(DELETE_STATUS = 1, 1, null)) AS DELETE_COUNT
+		FROM
+			MEMBER
+	]]>
+	</select>
+	
+	<select id="readAll" resultType="MemberEntity" parameterType="com.app.components.member.param.ReadInParam">
+		SELECT
+			*
+		FROM
+			MEMBER
+		<where>
+			<if test="enabledCode != null">ENABLED_CODE = #{enabledCode} AND</if>
+			<if test="deleteStatus != null">DELETE_STATUS = #{deleteStatus} AND</if>
+			ROLE_CODE != 5
+		</where>
+		ORDER BY
+			NAME
+	</select>
+	
+	<update id="updateRoleCode" parameterType="com.app.components.member.param.UpdateRoleCodeInParam">
+		UPDATE
+			MEMBER
+		SET
+			<if test="avatar != null">AVATAR = #{avatar},</if>
+			ROLE_CODE = #{roleCode}
+			
+		WHERE
+			EMAIL = #{email}
+	</update>
+	
+	<update id="updateSubjectCode" parameterType="com.app.components.member.param.UpdateSubjectCodeInParam">
+		UPDATE
+			MEMBER
+		SET
+			<if test="avatar != null">AVATAR = #{avatar},</if>
+			SUBJECT_CODE = #{subjectCode}
+		WHERE
+			EMAIL = #{email}
+	</update>
+	
+	<update id="resetPassword" parameterType="com.app.components.member.param.ResetPasswordInParam">
+		UPDATE
+			MEMBER
+		SET
+			ACCESS_TRY_COUNT = 0,
+			PASSWORD = #{password},
+			PASSWORD_UPDATE = NOW()
+		WHERE
+			EMAIL = #{email}
+	</update>
+	
+	<update id="ban" parameterType="com.app.components.member.param.BanInParam">
+		UPDATE
+			MEMBER
+		SET
+			<if test="authStr != null">AUTH_STR = #{authStr},</if>
+			ENABLED_CODE = #{enabledCode}
+		WHERE
+			EMAIL = #{email}
+	</update>
+	
+	<update id="updateDeleteStatus">
+	<![CDATA[
+		UPDATE
+			MEMBER
+		SET
+			DELETE_STATUS = 1,
+			DELETE_DATE = NOW()
+		WHERE
+			EMAIL = #{param1} AND
+			ROLE_CODE < 4
+	]]>
+	</update>
+	
+	<update id="updatePassword">
+		UPDATE
+			MEMBER
+		SET
+			PASSWORD = #{param1},
+			PASSWORD_UPDATE = now()
+		WHERE
+			EMAIL = #{param2}
+	</update>
+	
+
+</mapper>

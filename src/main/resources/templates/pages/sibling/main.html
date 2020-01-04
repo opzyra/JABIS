@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" 
+xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{layout/app_layout.html}" 
+th:with="
+title='JABIS', 
+bodyClass='animsition page-project counse-main site-navbar-small',  
+menu='#menuStudent, #menuSiblingList'
+">
+
+<th:block layout:fragment="page">
+
+<div id="siblingVue" class="page">
+
+	<div class="page-content container-fluid">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+					<div class="row">
+						<div class="col-lg-4 p-0">
+							<div class="panel-header">
+								<h3 class="m-t-0">형제 현황</h3> 
+								<div>
+									<i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>등록된 학생의 형제 현황 일람입니다.</div> <div>
+									<i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>형제 정보 수정은 학생 정보에서 수정할 수 있습니다.</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-8">
+							<ul class="panel-info">
+					            <li>
+					              <div class="num black-600" v-text="count"></div>
+					              <p class="link" v-on:click="allSibling()">전체</p>
+					            </li>
+					          </ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-8">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+					<h4 class="m-t-0"><i aria-hidden="true" class="icon fa-filter m-r-5 text-primary"></i>검색 필터링</h4>
+					<div class="form-group row filter">
+		               <div class="col-md-12 col-padding">
+		               	<label class="col-form-label label-block m-r-34">
+		              	 <i class="icon fa-angle-double-right m-r-5 text-primary" aria-hidden="true"></i>구분 
+		                </label>
+		                 <select id="gradeCode" name="gradeCode" class="form-control form-control-inline schools">
+							<option value="1">초등학생</option>
+							<option value="2">중학생</option>
+							<option value="3">고등학생</option>
+						</select>
+						<select id="grade" name="grade" class="form-control form-control-inline grade">
+						    <option value="0">전체</option>
+							<option value="1">1</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+							<option value="5">5</option>
+							<option value="6">6</option>
+						</select>
+						<button v-on:click="searchSibling()" type="button" class="btn btn-icon btn-default btn-outline"><i class="icon fa-filter" aria-hidden="true"></i></button>
+		               </div>
+		             </div>
+		             <div class="form-group row filter">
+		               <div class="col-md-12 col-padding">
+		               	<label class="col-form-label label-block">
+		              	 <i class="icon fa-angle-double-right m-r-5 text-primary" aria-hidden="true"></i>학원생 
+		                </label>
+		                 <select id="studentName" name="studentName" class="form-control form-control-inline schools">
+							<option></option>
+							<option v-for="item in student" v-bind:value="item.studentIdx" v-text="item.studentName"></option>
+						</select>
+						<button v-on:click="studentSiblingSearch()" type="button" class="btn btn-icon btn-default btn-outline"><i class="icon fa-filter" aria-hidden="true"></i></button>
+		               </div>
+		             </div>
+				</div>
+			</div>
+			<div class="col-lg-4 filter-box">
+				<div class="panel p-25 panel-marge mobile-p-b-0" style="height: 177.24px">
+					<h4 class="m-t-0"><i aria-hidden="true" class="icon wb-menu m-r-5 text-primary"></i>메뉴</h4>
+					<button type="button" class="btn btn-icon btn-block btn-primary btn-outline" v-on:click="printList()"><i aria-hidden="true" class="icon wb-print m-r-5"></i>화면 출력</button>
+				</div>
+			</div>
+			<div class="col-lg-12">
+				<div class="panel p-30 mobile-height-auto mobile-table m-b-0" style="height: 1380px;">
+					<div id="loadingBar" class="loading-bar">
+				      <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+				    </div>
+					<table class="table table-hover toggle-circle" id="siblingList"
+	                  data-paging="true" data-filtering="flase" data-sorting="true" data-paging-size="30">
+	                  <thead>
+	                    <tr>
+	                      <th data-name="name">이름</th>
+	                      <th data-name="school">학교</th>
+	                      <th data-name="grade">학년</th>
+	                      <th data-name="studentName" data-breakpoints="xs sm md">학원생</th>
+	                      <th data-name="studentSchool" data-breakpoints="xs sm md">학원생 학교</th>
+	                      <th data-name="studentGrade" data-breakpoints="xs sm md">학원생 학년</th>
+	                      <th data-name="relation" data-breakpoints="xs sm md">관계</th>
+	                      <th data-name="parentPhone" data-breakpoints="xs sm md">부모 연락처</th>
+	                      <th data-name="memo" data-breakpoints="xs sm md" style="width:30%">메모</th>
+	                      <th data-name="edit" data-breakpoints="xs sm md">편집</th>
+	                    </tr>
+	                  </thead>
+	                </table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal -->
+	<div class="modal fade modal-primary" id="updateMemo" aria-hidden="true" aria-labelledby="updateMemo" role="dialog" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">×</span>
+					</button>
+					<h4 class="modal-title">메모 수정</h4>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+						<label for="className" class="form-control-label">이름</label>
+                		<input type="text" id="modalUpdateOriginClassName" name="modalUpdateOriginClassName" class="form-control" disabled="disabled" v-model="updateName">
+					</div>
+					<div class="form-group">
+						<label for="className" class="form-control-label">수정 전 메모</label>
+                		<input type="text" id="modalUpdateClassName" name="modalUpdateClassName" disabled="disabled" class="form-control" maxlength="20" v-model="oldMemo">
+					</div>
+					<div class="form-group">
+						<label for="className" class="form-control-label">수정 후 메모<span class="f-s-12 m-l-5 text-danger">※ 메모 내용을 지울시 공란</span></label>
+                		<input type="text" id="className" name="className" placeholder="변경할 메모 내용을 입력해 주세요." class="form-control" maxlength="200" v-model="updateMemo">
+					</div>
+				</div>	
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" v-on:click="requestUpdateMemo()">수정</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">취소</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End Modal -->
+	
+
+</div>
+
+</th:block>
+
+<th:block layout:fragment="vuejs">
+	<script th:attr="src=@{'/js/vue/siblingVue.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customScript">
+	<script th:attr="src=@{'/js/custom/sibling.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customStyle">
+	<link rel="stylesheet" th:attr="href=@{'/css/custom/sibling.css?ver=' + ${@environment.getProperty('app.version')}}">
+</th:block>
+
+</html>

@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.components.counse.data.CounseDao">
+
+	<resultMap type="CounseDto" id="CounseDto">
+		<id property="idx" column="IDX"/>
+		<result property="name" column="NAME"/>
+		<result property="school" column="SCHOOL"/>
+		<result property="grade" column="GRADE"/>
+		<result property="gradeCode" column="GRADE_CODE"/>
+		<collection property="sibling" javaType="ArrayList" ofType="com.app.components.sibling.data.SiblingEntity" resultMap="map"/>
+	</resultMap>
+
+	<resultMap type="CounseEntity" id="CounseEntity">
+		<id property="idx" column="IDX"/>
+		<result property="studentIdx" column="STUDENT_IDX"/>
+		<result property="writeEmail" column="WRITE_EMAIL"/>
+		<result property="studyStyle" column="STUDY_STYLE"/>
+		<result property="studentStyle" column="STUDENT_STYLE"/>
+		<result property="future" column="FUTURE"/>
+		<result property="parentStyle" column="PARENT_STYLE"/>
+		<result property="parentRequest" column="PARENT_REQUEST"/>
+		<result property="studentCounse" column="STUDENT_COUNSE"/>
+		<result property="parentCounse" column="PARENT_COUNSE"/>
+		<collection property="sibling" javaType="ArrayList" ofType="com.app.components.sibling.data.SiblingEntity" resultMap="map"/>
+	</resultMap>
+
+	<resultMap type="com.app.components.sibling.data.SiblingEntity" id="map">
+		<id property="idx" column="SIBLING_IDX"/>
+		<result property="relation" column="RELATION"/>
+		<result property="name" column="SIBLING_NAME"/>
+		<result property="school" column="SIBLING_SCHOOL"/>
+		<result property="grade" column="SIBLING_GRADE"/>
+		<result property="memo" column="MEMO"/>
+	</resultMap>
+	
+	
+
+	<select id="readAll" resultType="counseListDto" parameterType="com.app.components.counse.param.ListInParam">
+		SELECT
+			COUNSE.IDX,
+			COUNSE.COUNSE_DATE,
+			COUNSE.MODE,
+			COUNSE.WRITE_DATE,
+			COUNSE.WRITE_EMAIL,
+			MEMBER.NAME
+		FROM
+			COUNSE LEFT JOIN MEMBER
+		ON
+			COUNSE.WRITE_EMAIL = MEMBER.EMAIL
+		WHERE
+			COUNSE.STUDENT_IDX = #{studentIdx}
+		<if test="start != null">
+		<![CDATA[
+			AND COUNSE.COUNSE_DATE >= #{start}
+			AND COUNSE.COUNSE_DATE <= #{end}
+		]]>
+		</if>
+		ORDER BY
+			COUNSE.COUNSE_DATE DESC
+	</select>
+
+	<select id="readOne" resultType="CounseEntity" parameterType="Integer">
+		SELECT
+			*
+		FROM
+			COUNSE
+		WHERE
+			IDX = #{param1}
+	</select>
+
+	<select id="readLastOne" resultType="CounseEntity" parameterType="Integer">
+		SELECT
+			*
+		FROM
+			COUNSE
+		WHERE
+			STUDENT_IDX = #{param1}
+		ORDER BY
+			IDX DESC
+		LIMIT 0, 1
+	</select>
+
+	<!-- 
+	<select id="readOne" resultType="CounseEntity" parameterType="Integer">
+		SELECT
+			COUNSE.IDX,
+			COUNSE.STUDENT_IDX,
+			COUNSE.WRITE_DATE,
+			COUNSE.WRITE_EMAIL,
+			COUNSE.STUDY_STYLE,
+			COUNSE.STUDENT_STYLE,
+			COUNSE.FUTURE,
+			COUNSE.PARENT_STYLE,
+			COUNSE.PARENT_REQUEST,
+			COUNSE.STUDENT_COUNSE,
+			COUNSE.PARENT_COUNSE,
+			SIBLING.IDX AS SIBLING_IDX,
+			SIBLING.RELATION,
+			SIBLING.NAME AS SIBLING_NAME,
+			SIBLING.SCHOOL AS SIBLING_SCHOOL,
+			SIBLING.GRADE AS SIBLING_GRADE,
+			SIBLING.MEMO
+		FROM
+			COUNSE LEFT JOIN SIBLING
+		ON
+			COUNSE.STUDENT_IDX = SIBLING.STUDENT_IDX
+		WHERE
+			COUNSE.STUDENT_IDX = #{param1}
+	</select>
+	 -->
+	 
+	<select id="readInit" resultMap="CounseDto">
+		SELECT
+			STUDENT.IDX,
+			STUDENT.NAME,
+			STUDENT.SCHOOL,
+			STUDENT.GRADE,
+			STUDENT.GRADE_CODE,
+			SIBLING.IDX AS SIBLING_IDX,
+			SIBLING.RELATION,
+			SIBLING.NAME AS SIBLING_NAME,
+			SIBLING.SCHOOL AS SIBLING_SCHOOL,
+			SIBLING.GRADE AS SIBLING_GRADE,
+			SIBLING.MEMO
+		FROM
+			STUDENT LEFT JOIN SIBLING
+		ON
+			STUDENT.IDX = SIBLING.STUDENT_IDX
+		WHERE
+			STUDENT.IDX = #{param1}
+	</select>
+	
+	<select id="count" resultType="Integer">
+		SELECT
+			COUNT(1)
+		FROM
+			COUNSE
+		WHERE
+			STUDENT_IDX = #{param1}
+	</select>
+	
+	<insert id="createOne" parameterType="CounseEntity">
+		INSERT
+		INTO COUNSE(
+			STUDENT_IDX,
+			MODE,
+			COUNSE_DATE,
+			WRITE_DATE,
+			WRITE_EMAIL,
+			FUTURE,
+			STUDY_STYLE,
+			STUDENT_STYLE,
+			PARENT_STYLE,
+			PARENT_REQUEST,
+			STUDENT_COUNSE,
+			PARENT_COUNSE
+		)
+		VALUES(
+			#{studentIdx},
+			#{mode},
+			#{counseDate},
+			now(),
+			#{writeEmail},
+			#{future},
+			#{studyStyle},
+			#{studentStyle},
+			#{parentStyle},
+			#{parentRequest},
+			#{studentCounse},
+			#{parentCounse}
+		)
+	</insert>
+	
+	<update id="updateOne"  parameterType="CounseEntity">
+		UPDATE
+			COUNSE
+		SET
+			COUNSE_DATE = #{counseDate},
+			WRITE_DATE = now(),
+			WRITE_EMAIL = #{writeEmail},
+			FUTURE = #{future},
+			STUDY_STYLE = #{studyStyle},
+			STUDENT_STYLE = #{studentStyle},
+			PARENT_STYLE = #{parentStyle},
+			PARENT_REQUEST = #{parentRequest},
+			STUDENT_COUNSE = #{studentCounse},
+			PARENT_COUNSE = #{parentCounse}
+		WHERE
+			IDX = #{idx}
+	</update>
+	
+	<delete id="deleteOne">
+		DELETE
+		FROM
+			COUNSE
+		WHERE
+			IDX = #{param1}
+	</delete>
+	
+	<select id="readLatest" resultType="CounseEntity">
+	<![CDATA[
+		(SELECT
+			*
+		FROM
+			COUNSE
+		WHERE
+			STUDENT_IDX = #{param1} AND
+			MODE >= 1
+		ORDER BY
+			COUNSE_DATE DESC, IDX
+		LIMIT
+			5)
+		UNION ALL
+		(SELECT
+			*
+		FROM
+			COUNSE
+		WHERE
+			STUDENT_IDX = #{param1} AND
+			MODE = 0
+		)
+	]]>
+	</select>
+	
+</mapper>

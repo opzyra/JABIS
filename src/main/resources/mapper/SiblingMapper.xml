@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.components.sibling.data.SiblingDao">
+
+	<select id="readOne" resultType="SiblingEntity" parameterType="Integer">
+		SELECT
+			*
+		FROM
+			SIBLING
+		WHERE
+			IDX = #{param1}
+	</select>
+	
+	<insert id="createOne" parameterType="SiblingEntity">
+		INSERT
+		INTO SIBLING(
+			STUDENT_IDX,
+			RELATION,
+			NAME,
+			SCHOOL,
+			GRADE,
+			GRADE_CODE
+		)
+		VALUES(
+			#{studentIdx},
+			#{relation},
+			#{name},
+			#{school},
+			#{grade},
+			#{gradeCode}
+		)
+	</insert>
+	
+	<update id="updateOne" parameterType="SiblingEntity">
+		UPDATE
+			SIBLING
+		<set>
+			<if test="memo != null">MEMO = #{memo},</if>
+			RELATION = #{relation},
+			NAME = #{name},
+			SCHOOL = #{school},
+			GRADE = #{grade}
+		</set>
+		WHERE
+			IDX = #{idx}
+	</update>
+	
+	<delete id="deleteOne">
+		DELETE
+		FROM SIBLING
+		WHERE
+			IDX = #{param1}
+	</delete>
+
+	<select id="readSiblingList" parameterType="com.app.components.sibling.param.SearchInParam"  resultType="SiblingDto">
+		SELECT
+			SIBLING.IDX,
+			SIBLING.RELATION,
+			SIBLING.NAME,
+			SIBLING.SCHOOL,
+			SIBLING.GRADE,
+			SIBLING.GRADE_CODE,
+			SIBLING.MEMO,
+			STUDENT.IDX AS STUDENT_IDX,
+			STUDENT.SCHOOL AS STUDENT_SCHOOL,
+			STUDENT.GRADE AS STUDENT_GRADE,
+			STUDENT.STATUS,
+			STUDENT.NAME AS STUDENT_NAME,
+			STUDENT.PARENT_PHONE
+		FROM
+			SIBLING LEFT JOIN STUDENT
+		ON
+			SIBLING.STUDENT_IDX = STUDENT.IDX
+		<where>
+			<if test="grade != null and grade !=0">
+			SIBLING.GRADE = #{grade}
+			</if>
+			<if test="gradeCode != null and gradeCode != 0">
+			AND SIBLING.GRADE_CODE = #{gradeCode}
+			</if>
+			<if test="status != null and status != 0">
+			AND STUDENT.STATUS = #{status}
+			</if>
+			<if test="studentIdx != null">
+			AND STUDENT.IDX = #{studentIdx}
+			</if>
+		</where>
+	</select>
+	
+	<select id="count" resultType="Integer">
+		SELECT
+			COUNT(1)
+		FROM
+			SIBLING
+	</select>
+	
+	<update id="updateMemo" parameterType="com.app.components.sibling.param.UpdateMemoInParam">
+		UPDATE
+			SIBLING
+		SET
+			MEMO = #{memo}
+		WHERE
+			IDX = #{idx}
+	</update>
+
+</mapper>

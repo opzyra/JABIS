@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout/login_layout.html}"
+  th:with="
+  title='JABIS',
+  bodyClass='animsition page-error page-error-500 layout-full'
+  ">
+    <div layout:fragment="page" class="page vertical-align text-center" data-animsition-in="fade-in" data-animsition-out="fade-out">
+      <div class="page-content vertical-align-middle">
+        <header>
+          <h1 class="animation-slide-top" th:text="${errorCode}">500</h1>
+          <p>시스템에 치명적인 오류가 발생하였습니다.</p>
+        </header>
+        <p class="error-advise">메인 화면으로 이동하시거나 다시 시도해 주세요.</p>
+        <a class="btn btn-primary btn-round" href="/">메인으로 이동</a>
+
+        <footer th:replace="fragments/login/footer::footerFragment"></footer>
+      </div>
+    </div>
+    
+    <th:block layout:fragment="customScript">
+    </th:block>
+    
+    <th:block layout:fragment="customStyle">
+    <link rel="stylesheet" href="/css/custom/errors.css">
+	</th:block>
+</html>

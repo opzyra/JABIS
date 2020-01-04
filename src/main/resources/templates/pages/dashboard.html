@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" 
+xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+layout:decorate="~{layout/app_layout.html}"
+th:with="
+title='JABIS',
+bodyClass='animsition site-navbar-small dashboard',
+menu='#menuHome'
+">
+
+<th:block layout:fragment="page">
+	<div id="dashbaordVue" class="page page-content">
+		<div class="row">
+			<div class="col-xxl-5 col-lg-5">
+              <div class="card p-30 flex-row justify-content-between" style="height: 128px">
+                <div class="counter counter-md text-left">
+                  <div class="counter-number-group">
+                    <span class="counter-number" v-text="userName"></span>
+                    <span class="counter-number-related text-capitalize f-s-20" v-text="roleName"></span>
+                  </div>
+                  <div class="counter-label text-capitalize font-size-14"><span id="typed"></span></div>
+                  <div id="typed-strings">
+                     <span>JABIS 접속을 환영합니다.</span>
+                     <span>공지사항을 확인해주세요.</span>
+                     <span>계정의 보안을 위해 비밀번호를 자주 변경해주세요.</span>
+                     <span>학생의 성적과 상담일지를 등록해주세요.</span>
+                  </div>
+                </div>
+                <div class="white">
+                  <i class="icon icon-circle icon-2x wb-user bg-blue-600" aria-hidden="true"></i>
+                </div>
+              </div>
+
+				<div class="card card-shadow card-lg card-completed-options mobile-hight-auto" style="height: 480px">
+					<div class="card-header card-header-transparent pb-10">
+		              <div class="card-header-actions">
+		                <a class="text-action" href="/app/notice/"><i class="icon wb-more-horizontal" aria-hidden="true"></i></a>
+		              </div>
+		              <h4 class="card-title text-primary m-b-0"><i class="icon wb-chat-working m-r-10"></i>공지사항</h4>
+		            </div>
+		            <div class="card-body p-t-0 mobile-notice">
+		            	<ul class="list-group list-group-dividered list-group-full">
+			                <li class="list-group-item" v-for="item in notice">
+			                  <div class="media comment">
+			                    <div class="media-body comment-body">
+			                      <div class="comment-content">
+			                        <a class="notice-title" href="javascript:void(0);" v-text="item.title" v-on:click="gotoNoticeDetail(item.idx)"></a>
+			                      </div>
+		                      
+			                      <div class="comment-meta">
+									<span class="author"><i class="icon fa-user m-r-5"></i><span v-text="item.name"></span></span>
+									<span class="started"><i class="icon fa-clock-o m-r-5"></i><span v-text="item.writeDate"></span></span>
+									<span class="started"><i class="icon fa-bolt m-r-5"></i><span v-text="item.viewCount"></span></span>
+								</div>
+			                      
+			                    </div>
+			                  </div>
+			                </li>
+			                <li v-if="notice.length == 0" style="list-style: none;">
+			                	<div>공지사항이 없습니다.</div>
+			                </li>
+			              </ul>
+		            </div>
+				</div>
+			</div>
+			<div class="col-xxl-7 col-lg-7" v-show="role < 2">
+				<div class="card card-shadow card-lg card-completed-options mobile-hight-auto" style="height: 638px">
+					<div class="card-header card-header-transparent pb-10">
+		              <div class="card-header-actions">
+		              	<a class="text-action" href="javascript:void(0)" v-on:click="studentMore()"><i class="icon wb-more-horizontal" aria-hidden="true"></i></a>
+		              </div>
+		              <h4 class="card-title text-primary"><i class="icon wb-users m-r-10"></i>담당 학생</h4>
+		            </div>
+		            <div class="card-body p-t-0">
+		            	<div id="loadingBar1" class="loading-bar">
+					      <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+					    </div> 
+		            	<table class="table table-hover toggle-circle" id="studentList"
+		                  data-paging="true" data-filtering="false" data-sorting="true" data-paging-size="10">
+		                  <thead>
+		                    <tr>
+		                      <th data-name="name">이름</th>
+		                      <th data-name="school" data-breakpoints="xs sm md">학교</th>
+		                      <th data-name="grade" data-breakpoints="xs sm md">학년</th>
+		                      <th data-name="classNomal" data-breakpoints="xs sm md">반 편성<span class="f-s-12 m-l-3">(일반)</span></th>
+		                      <th data-name="classTest" data-breakpoints="xs sm md">반 편성<span class="f-s-12 m-l-3">(시험)</span></th>
+		                      <th data-name="more" class="text-center">정보</th>
+		                    </tr>
+		                  </thead>
+		                </table>
+		            </div>
+				</div>
+			</div>
+			<div class="col-xxl-7 col-lg-7" v-show="role >= 2">
+				<div class="card card-shadow card-lg card-completed-options mobile-hight-auto" style="height: 638px">
+					<div class="card-header card-header-transparent pb-10">
+		              <div class="card-header-actions">
+		              	<a class="text-action" href="javascript:void(0)" v-on:click="gotoTeacherMore()"><i class="icon wb-more-horizontal" aria-hidden="true"></i></a>
+		              </div>
+		              <h4 class="card-title text-primary"><i class="icon wb-text m-r-10"></i>담임 강사</h4>
+		            </div>
+		            <div class="card-body p-t-0">
+		            	<div id="loadingBar2" class="loading-bar">
+					      <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+					    </div> 
+		            	<table class="table table-hover toggle-circle" id="teacherList"
+		                  data-paging="true" data-filtering="false" data-sorting="true" data-paging-size="10">
+		                  <thead>
+		                    <tr>
+		                      <th data-name="name">이름</th>
+		                      <th data-name="status" data-breakpoints="xs sm md">직책</th>
+		                      <th data-name="subject" data-breakpoints="xs sm md">과목</th>
+		                      <th data-name="hrtCount" class="text-center" data-breakpoints="xs sm md">학생 수</th>
+		                      <th data-name="counseCount" class="text-center">오늘 상담</th>
+                      	      <th data-name="month" class="text-center">이달 상담</th>
+		                      <th data-name="work" class="text-center" data-breakpoints="xs">상담 현황</th>
+		                      <th data-name="more" class="text-center">학생 목록</th>
+		                    </tr>
+		                  </thead>
+		                </table>
+		            </div>
+				</div>
+			</div>
+			<div class="col-lg-4">
+				<div id="personalCompletedWidget"class="card card-shadow card-lg pb-20">
+					<div class="card-header card-header-transparent pb-10">
+						<h4 class="card-title text-primary m-b-0"><i class="icon fa-bar-chart m-r-10"></i>정보 요약</h4>
+						<div class="m-t-5">
+							조회 기준 시간 : <span class="text-success" v-text="today"></span>
+						</div>
+					</div>
+		            <div class="card-block">
+		              <div class="row text-center mb-20">
+		                <div class="col-6">
+		                  <div class="counter">
+		                    <div class="counter-label total-completed">재학생</div>
+		                    <div class="counter-number red-600" v-text="studentCount"></div>
+		                  </div>
+		                </div>
+		                <div class="col-6">
+		                  <div class="counter">
+		                    <div class="counter-label">강사</div>
+		                    <div class="counter-number blue-600" v-text="teacherCount"></div>
+		                  </div>
+		                </div>
+		              </div>
+		              <div class="table-responsive">
+		                <table class="table">
+		                  <tbody>
+		                    <tr>
+		                      <td>
+		                        오늘 상담 진행률
+		                      </td>
+		                      <td>
+		                        <div class="progress progress-xs mb-0">
+		                          <div id="todayCounse" class="progress-bar progress-bar-info bg-blue-600" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+		                          </div>
+		                        </div>
+		                      </td>
+		                      <td>
+		                        <span v-text="todayCounse"></span>%
+		                      </td>
+		                    </tr>
+		                    <tr>
+		                      <td>
+		                        이달 상담 진행률
+		                      </td>
+		                      <td>
+		                        <div class="progress progress-xs mb-0">
+		                          <div id="monthCounse" class="progress-bar progress-bar-info bg-green-600" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+		                          </div>
+		                        </div>
+		                      </td>
+		                      <td>
+		                        <span v-text="monthCounse"></span>%
+		                      </td>
+		                    </tr>
+		                    <tr>
+		                      <td>
+		                       오늘 접속률
+		                      </td>
+		                      <td>
+		                        <div class="progress progress-xs mb-0">
+		                          <div id="accessCount" class="progress-bar progress-bar-info bg-red-600" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+		                          </div>
+		                        </div>
+		                      </td>
+		                      <td>
+		                        <span v-text="accessCount"></span>%
+		                      </td>
+		                    </tr>
+		                  </tbody>
+		                </table>
+		              </div>
+		            </div>
+		          </div>
+			</div>
+			<div class="col-lg-4">
+				<div class="card card-shadow card-lg pb-20">
+					<div class="card-header card-header-transparent pb-10">
+					  <div class="card-header-actions">
+		                <span class="badge badge-round badge-danger float-right" v-text="navRoot.newNotification.length"></span>
+		              </div>
+		              <h4 class="card-title text-primary m-b-0"><i class="icon wb-bell m-r-10"></i>새로운 알림</h4>
+		            </div>
+		            <div class="card-body p-t-0 mobile-notice">
+		            	<ul class="list-group list-group-full h-300 max-height-300" data-plugin="scrollable">
+		            		<div data-role="container">
+                   				 <div data-role="content">
+				                	<li class="list-group-item" v-for="item in navRoot.newNotification">
+					                    <div class="media">
+					                      <div class="m-l-5 m-r-10">
+											<i v-bind:class="item.icon" aria-hidden="true"></i>
+					                      </div>
+					                      <div class="media-body">
+					                        <time class="timeago text-muted f-s-10 pc-toggle float-right" v-bind:datetime="item.regDate"></time>
+					                        <h6 class="mt-0 mb-5" v-html="item.title"></h6>
+					                        <time class="timeago text-muted f-s-10 mobile-toggle" v-bind:datetime="item.regDate"></time></div>
+					                    </div>
+					                  </li>
+					                  <li class="list-group-item" v-if="navRoot.newNotification.length == 0">
+					                  	 <div class="media">
+					                      <div class="m-l-5 m-r-10">
+											<i class="icon wb-chat bg-orange-600 white icon-circle" aria-hidden="true"></i>
+					                      </div>
+					                      <div class="media-body">
+					                        <h6 class="mt-0 mb-5">새로운 알림이 없습니다.<br>확인된 알림은 상단 메뉴에서 확인해주세요.</h6>
+					                    </div>
+					                  </li>
+			                  	</div>
+			                 </div>
+		                </ul>
+		            </div>
+				</div>
+			</div>
+			<div class="col-lg-4">
+				<div class="card card-shadow card-lg pb-20">
+					<div class="card-header card-header-transparent pb-10">
+					  <div class="card-header-actions">
+		                <span class="badge badge-round badge-primary float-right" v-text="studentLatest.length"></span>
+		              </div>
+		              <h4 class="card-title text-primary m-b-0"><i class="icon wb-users m-r-10"></i>이달 입학생</h4>
+		            </div>
+		            <div class="card-body p-t-0 mobile-notice">
+					<ul class="list-group list-group-full h-300 max-height-300" data-plugin="scrollable">
+	                  <div data-role="container">
+	                    <div data-role="content">
+	                      <li class="list-group-item" v-for="item in studentLatest">
+	                        <small class="text-muted float-right" v-text="item.regDate"></small>
+	                        <p class="m-b-0"><a class="hightlight" v-text="item.name" href="javascript:void(0);"v-on:click="gotoStudentMore(item.idx)"></a>
+	                          <span class="f-s-10">
+	                          	<span v-if="item.school == '미입력'" class="text-danger">미입력</span>
+	                          	<span v-else><span v-text="item.school"></span> <span v-text="item.grade"></span> 학년</span>
+	                          </span>
+	                        </p>
+	                        <div class="f-s-10">
+	                          <i class="icon wb-text m-r-5" aria-hidden="true"></i><span v-html="item.hrtName"></span><i class="icon wb-list m-l-10 m-r-5"></i><span v-html="item.classNomal"></span> / <span v-html="item.classTest"></span>
+	                        </div>
+	                      </li>
+	                      <li class="list-group-item" v-if="studentLatest.length == 0">
+	                        <p class="m-b-0"><a class="hightlight">이달의 입학생이 없습니다.</a>
+	                        </p>
+	                      </li>
+	                      </div>
+	                    </div>
+	                  </ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</th:block>
+
+<th:block layout:fragment="vuejs">
+	<script th:attr="src=@{'/js/vue/dashboardVue.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customScript">
+	<script th:attr="src=@{'/vendor/typedjs/typed.min.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+	<script th:attr="src=@{'/js/custom/dashboard.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+ 
+<th:block layout:fragment="customStyle">
+	<link rel="stylesheet" th:attr="href=@{'/css/custom/dashboard.css?ver=' + ${@environment.getProperty('app.version')}}">
+</th:block>
+
+</html>

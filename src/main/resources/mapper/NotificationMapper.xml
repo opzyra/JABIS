@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.components.notification.data.NotificationDao">
+
+	<select id="readAll" resultType="NotificationDto">
+	<![CDATA[
+		SELECT
+			*
+		FROM
+			NOTIFICATION
+		WHERE
+			EMAIL = #{param1}
+		ORDER BY
+			IDX DESC
+	]]>
+	</select>
+	
+	<select id="readLatest" resultType="NotificationDto">
+	<![CDATA[
+		SELECT
+			*
+		FROM
+			NOTIFICATION
+		WHERE
+			EMAIL = #{param1}
+		ORDER BY
+			NOTIFICATION.READ, IDX DESC
+		LIMIT
+			0, 10
+	]]>
+	</select>
+	
+	<insert id="createOne">
+		INSERT
+		INTO NOTIFICATION(
+			EMAIL,
+			ICON,
+			TITLE
+		)
+		VALUES(
+			#{param1},
+			#{param2},
+			#{param3}
+		)
+	</insert>
+	
+	<update id="updateRead">
+		UPDATE
+			NOTIFICATION
+		SET
+			NOTIFICATION.READ = 1,
+			NOTIFICATION.READ_DATE = NOW()
+		WHERE
+			NOTIFICATION.EMAIL = #{param1} AND
+			NOTIFICATION.IDX = #{param2}
+			
+	</update>
+	
+	<update id="updateAllRead">
+		UPDATE
+			NOTIFICATION
+		SET
+			NOTIFICATION.READ = 1,
+			NOTIFICATION.READ_DATE = NOW()
+		WHERE
+			NOTIFICATION.EMAIL = #{param1} AND
+			NOTIFICATION.READ = 0
+	</update>
+
+</mapper>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" 
+xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{layout/app_layout.html}" 
+th:with="
+title='JABIS', 
+bodyClass='animsition site-navbar-small app-forum page-aside-left',
+boardTitle='공지사항', 
+menu='#menuNotice'
+">
+<th:block layout:fragment="page">
+<div id="noticeVue" class="page">
+
+	<div class="page-content container-fluid">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+					<div class="row">
+						<div class="col-lg-7">
+							<div class="panel-header">
+								<h3 class="m-t-0">공지사항</h3> 
+								<div><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>학원 및 시스템에 관련된 공지사항 입니다.</div> 
+								<div><i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>공지사항을 수시로 확인해 주세요.</div>
+							</div>	
+						</div>
+						<div class="col-lg-5 panel-header-help" sec:authorize="hasAnyAuthority('ROLE_WEB', 'ROLE_ADMIN', 'ROLE_MASTER')">
+							<button type="button" class="btn btn-primary" onclick="location.href='/app/notice/create'">글쓰기</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-12">
+				<div class="panel p-25 mobile-height-auto mobile-table m-b-0" style="height: 1113px">
+					<div class="m-t-5 m-b-10">
+						<form action="#" role="search" v-on:submit.prevent="requestSearch">
+							<div class="input-search">
+								<input type="text" class="form-control w-full" placeholder="공지사항 게시글 검색..." name="" v-model="query">
+								<button type="submit" class="input-search-btn">
+								<i class="icon wb-search" aria-hidden="true"></i>
+								</button>
+							</div>
+						</form>
+					</div>
+					<div class="page-nav-tabs">
+						<ul class="nav nav-tabs nav-tabs-line">
+							<li class="nav-item" role="presentation">
+							<a class="nav-link" href="javascript:void(0)" aria-controls="forum-newest" aria-expanded="true" role="tab" v-on:click="requestOrder('desc')" v-bind:class="{ active: isActive.desc }">최신순</a>
+							</li>
+							<li class="nav-item">
+							<a class="nav-link" href="javascript:void(0)" aria-controls="forum-activity" aria-expanded="false" role="tab" v-on:click="requestOrder('viewCount')" v-bind:class="{ active: isActive.viewCount }">조회순</a>
+							</li>
+							<li class="nav-item">
+							<a class="nav-link" href="javascript:void(0)" aria-controls="forum-activity" aria-expanded="false" role="tab" v-on:click="requestOrder('commentsCount')" v-bind:class="{ active: isActive.commentsCount }">댓글순</a>
+							</li>
+						</ul>
+					</div>
+					<div class="page-content tab-content page-content-table nav-tabs-animate">
+						<div class="tab-pane active" id="forum-newest" role="tabpanel">
+							<table class="table is-indent">
+							<tbody>
+							<tr class="list-animate" v-for="item in boards" v-model="boards" v-on:click="detail(item.idx)">
+								<td class="cell-60 responsive-hide">
+									<a class="avatar" href="javascript:void(0)">
+									<img width="60" height="60" alt="avatar" v-bind:avatar="item.avatar">
+									</a>
+								</td>
+								<td>
+									<div class="content">
+										<div class="title" v-text="item.title">
+										</div>
+										<div class="metas">
+											<span class="author"><i class="icon fa-user m-r-5"></i><span v-text="item.name"></span></span>
+											<span class="started"><i class="icon fa-clock-o m-r-5"></i><span v-text="item.writeDate"></span></span>
+											<span class="started"><i class="icon fa-bolt m-r-5"></i><span v-text="item.viewCount"></span></span>
+										</div>
+									</div>
+								</td>
+								<td class="cell-80 forum-posts">
+									<span class="unit"><i class="icon fa-comments-o m-r-5"></i></span>
+									<span class="num" v-text="item.commentsCount"></span>
+								</td>
+							</tr>
+							<tr v-if="boards.length==0">
+								<td class="cell-60 responsive-hide">
+								</td>
+								<td>
+									<div class="content">
+										<div class="title">
+											게시글이 없습니다.
+										</div>
+										<div class="metas">
+											검색어 또는 카테고리를 확인해 주세요.
+										</div>
+									</div>
+								</td>
+							</tr>
+							</tbody>
+							</table>
+							<ul id="pagination" class="pagination pagination-sm pagination-gap">
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</th:block>
+
+<th:block layout:fragment="vuejs">
+	<script th:attr="src=@{'/js/vue/noticeVue.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customScript">
+	<script src="/vendor/bootstrap-markdown/bootstrap-markdown.js"></script>
+	<script src="/vendor/bootstrap-select/bootstrap-select.js"></script>
+	<script src="/vendor/marked/marked.js"></script>
+	<script src="/vendor/to-markdown/to-markdown.js"></script>
+	<script src="/js/common/Plugin/bootstrap-select.js"></script>
+	<script>
+		$('#pagination').pagination({
+	        items: noticeVue.$root.countPage,
+	        currentPage: noticeVue.$root.currentPage,
+	        onInit: function () {
+	            // fire first page loading
+	        },
+	        onPageClick: function (page, evt) {
+	        	if(evt != undefined){
+	        		noticeVue.$root.requestPage(page);
+	        	}
+	        }
+	    });
+	</script>
+</th:block>
+
+<th:block layout:fragment="customStyle">
+	<link rel="stylesheet" href="/vendor/bootstrap-markdown/bootstrap-markdown.css">
+	<link rel="stylesheet" th:attr="href=@{'/css/custom/notice.css?ver=' + ${@environment.getProperty('app.version')}}">
+</th:block>
+
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<meta charset="utf-8">
+<th:block th:fragment="cssFragment" layout:fragment="css">
+	<!-- Stylesheets -->
+    <link rel="stylesheet" href="/css/common/bootstrap.min.css" media="all">
+    <link rel="stylesheet" href="/css/common/bootstrap-extend.min.css" media="all">
+    <link rel="stylesheet" th:attr="href=@{'/css/common/site.min.css?ver=' + ${@environment.getProperty('app.version')}}" media="all">
+    
+    <!-- Plugins -->
+    <link rel="stylesheet" href="/vendor/animsition/animsition.css">
+    <link rel="stylesheet" href="/vendor/asscrollable/asScrollable.css">
+    <link rel="stylesheet" href="/vendor/switchery/switchery.css">
+    <link rel="stylesheet" href="/vendor/intro-js/introjs.css">
+    <link rel="stylesheet" href="/vendor/slidepanel/slidePanel.css">
+    <link rel="stylesheet" href="/vendor/flag-icon-css/flag-icon.css">
+    
+    <!-- Fonts -->
+    <link rel="stylesheet" href="/fonts/font-awesome/font-awesome.css">
+    <link rel="stylesheet" href="/fonts/web-icons/web-icons.min.css">
+    <link rel="stylesheet" href="/fonts/brand-icons/brand-icons.min.css">
+    <link rel='stylesheet' href="/fonts/Roboto/Roboto.css">
+    
+    <!-- Plugins -->
+    <link rel="stylesheet" href="/vendor/animate/animate.min.css">
+    <link rel="stylesheet" href="/vendor/bootstrap-table/bootstrap-table.css">
+    <link rel="stylesheet" href="/vendor/formvalidation/formValidation.css">
+    <link rel="stylesheet" href="/vendor/bootstrap-select/bootstrap-select.css">
+    <link rel="stylesheet" href="/vendor/nprogress/nprogress.css"/>
+    <link rel="stylesheet" href="/css/common/validation.css">
+    <link rel="stylesheet" href="/css/common/helper.css">
+    <link rel="stylesheet" href="/vendor/toolbar/toolbar.css">
+    <link rel="stylesheet" href="/vendor/select2/select2.css">
+    <link rel="stylesheet" href="/vendor/multi-select/multi-select.css">
+    <link rel="stylesheet" href="/vendor/bootstrap-datepicker/bootstrap-datepicker.css">
+    <link rel="stylesheet" href="/vendor/bootstrap-maxlength/bootstrap-maxlength.css">
+    <link rel="stylesheet" href="/vendor/asspinner/asSpinner.css">
+    <link rel="stylesheet" href="/vendor/easy-autocomplete/easy-autocomplete.css">
+    <link rel="stylesheet" href="/vendor/aspieprogress/asPieProgress.css">
+    <link rel="stylesheet" href="/vendor/spin/spin.css">
+    <link rel="stylesheet" href="/vendor/footable-bootstrap/css/footable.core.css">
+    <link rel="stylesheet" href="/vendor/bootstrap-select/bootstrap-select.css">
+	<link rel="stylesheet" href="/vendor/summernote/summernote.css">
+	<link rel="stylesheet" href="/vendor/autocomplete/autocomplete.css">
+	
+    <!-- Custom CSS -->
+    <th:block layout:fragment="customStyle"></th:block>
+    
+</th:block>
+</html>

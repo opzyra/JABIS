@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout/login_layout.html}"
+  th:with="
+  title='JABIS',
+  bodyClass='animsition page-error page-error-403 layout-full'
+  ">
+    <div layout:fragment="page" class="page vertical-align text-center" data-animsition-in="fade-in" data-animsition-out="fade-out">
+      <div class="page-content vertical-align-middle">
+        <header>
+          <h1 class="animation-slide-top">403</h1>
+          <p>접근 권한이 없습니다.</p>
+        </header>
+        <p class="error-advise">계정의 권한을 확인해 주세요.</p>
+        <a class="btn btn-primary btn-round" href="/">메인화면</a>
+
+        <footer th:replace="fragments/login/footer::footerFragment"></footer>
+      </div>
+    </div>
+    
+    <th:block layout:fragment="customScript">
+    </th:block>
+    
+    <th:block layout:fragment="customStyle">
+    <link rel="stylesheet" href="/css/custom/errors.css">
+	</th:block>
+</html>

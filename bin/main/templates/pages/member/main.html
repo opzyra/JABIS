@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html class="no-js css-menubar" lang="ko" 
+xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{layout/app_layout.html}" 
+th:with="
+title='JABIS', 
+bodyClass='animsition page-project student-list site-navbar-small',  
+menu='#menuConfig, #menuMember'
+">
+
+<th:block layout:fragment="page">
+<div id="memberVue" class="page">
+	<div class="page-content container-fluid">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="panel p-25 panel-marge mobile-p-b-0">
+					<div class="row">
+						<div class="col-lg-4 p-0">
+							<div class="panel-header"><h3 class="m-t-0">계정 관리</h3> 
+							<div>
+								<i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>JABIS에 가입된 계정을 관리합니다.</div> <div>
+								<i aria-hidden="true" class="icon fa-angle-double-right m-r-5 text-primary"></i>조회 기준 시간 : <span class="text-success" v-text="today"></span>
+							</div>
+						</div>
+						</div>
+						<div class="col-lg-8">
+							<ul class="panel-info">
+					            <li>
+					              <div class="num black-600" v-text="allCount"></div>
+					              <p class="link" v-on:click="statusUpdate(null)" v-bind:class="{ statusSelected: isActive.all }">전체</p>
+					            </li>
+					            <li>
+					              <div class="num green-600" v-text="authCount"></div>
+					              <p class="link" v-on:click="statusUpdate(0)" v-bind:class="{ statusSelected: isActive.auth }">정상</p>
+					            </li>
+					            <li>
+					              <div class="num blue-600" v-text="readyCount"></div>
+					              <p class="link" v-on:click="statusUpdate(1)" v-bind:class="{ statusSelected: isActive.ready }">미인증</p>
+					            </li>
+					            <li>
+					              <div class="num red-600" v-text="banCount"></div>
+					              <p class="link" v-on:click="statusUpdate(2)" v-bind:class="{ statusSelected: isActive.ban }">사용제한</p>
+					            </li>
+					            <li v-if="role == 5">
+					              <div class="num orange-600" v-text="deleteCount"></div>
+					              <p class="link" v-on:click="statusUpdate(3)" v-bind:class="{ statusSelected: isActive.delete }">삭제</p>
+					            </li>
+					          </ul>
+						</div>
+					</div>
+				</div>
+				
+			</div>
+			
+		</div>
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="panel p-30 mobile-height-auto mobile-table m-b-0" style="height: 996px">
+				<div id="loadingBar" class="loading-bar">
+			      <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+			    </div>
+				<table class="table table-hover toggle-circle" id="memberList"
+	                  data-paging="true" data-filtering="true" data-sorting="true" data-paging-size="20">
+	                  <thead>
+	                    <tr>
+	                      <th data-name="name">이름</th>
+	                      <th data-name="email" data-breakpoints="xs sm md">이메일</th>
+	                      <th data-name="regDate" data-breakpoints="xs sm md">가입</th>
+	                      <th data-name="accessLastDate">마지막 접속</th>
+	                      <th data-name="role" data-breakpoints="xs sm md">직책</th>
+	                      <th data-name="subject" data-breakpoints="xs sm md">과목</th>
+	                      <th data-name="phone" data-type="date" data-breakpoints="xs sm md">연락처</th>
+	                      <th data-name="status">상태</th>
+	                      <th data-name="authStr" data-type="date" data-breakpoints="xs sm md">인증코드</th>
+	                      <th data-name="passReset" class="text-center" data-breakpoints="xs sm md">암호 초기화</th>
+	                      <th data-name="ban" class="text-center" data-breakpoints="xs sm md">사용 제한</th>
+	                      <th data-name="delete" class="text-center" data-breakpoints="xs sm md">삭제</th>
+	                    </tr>
+	                  </thead>
+	                </table>
+	                </div>
+		</div>
+		</div>
+	</div>
+
+	<!-- Modal -->
+	<div class="modal fade modal-primary" id="roleModal" aria-hidden="true" aria-labelledby="roleModal" role="dialog" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">×</span>
+					</button>
+					<h4 class="modal-title">직책 변경</h4>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+                		<label for="name" class="form-control-label">대상자</label>
+                		<input class="form-control" v-bind:value="target.name" disabled="disabled">
+					</div>
+					<div class="form-group">
+                		<label for="name" class="form-control-label">현재 직책</label>
+                		<input class="form-control" v-bind:value="target.roleName" disabled="disabled">
+					</div>
+					<div class="form-group">
+						<label for="name" class="form-control-label">변경할 직책</label>
+						<div>
+							<select id="roleList" class="modal fade" name="roleList" style="width:100%;">
+								<option></option>
+								<option value="0" v-if="target.roleCode != 0">담당 과목</option>
+								<option value="1" v-if="target.roleCode != 1">담임</option>
+								<option value="2" v-if="target.roleCode != 2">팀장</option>
+								<option value="3" v-if="role > 3 && target.roleCode != 3">실장</option>
+								<option value="4" v-if="role > 4 && target.roleCode != 4">원장</option>
+							</select>
+						</div>
+					</div>
+					
+				</div>	
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" v-on:click="chanegRole()">변경</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">취소</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End Modal -->
+	
+	<!-- Modal -->
+	<div class="modal fade modal-primary" id="subjectModal" aria-hidden="true" aria-labelledby="subjectModal" role="dialog" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">×</span>
+					</button>
+					<h4 class="modal-title">담당 과목 변경</h4>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+                		<label for="name" class="form-control-label">대상자</label>
+                		<input class="form-control" v-bind:value="target.name" disabled="disabled">
+					</div>
+					<div class="form-group">
+                		<label for="name" class="form-control-label">현재 담당 과목</label>
+                		<input class="form-control" v-bind:value="target.subjectName" disabled="disabled">
+					</div>
+					<div class="form-group">
+						<label for="name" class="form-control-label">변경할 담당 과목</label>
+						<div>
+							<select id="subjectList" class="modal fade" name="subjectList" style="width:100%;">
+								<option></option>
+								<option value="0" v-if="target.subjectCode != 0">미정</option>
+								<option value="1" v-if="target.subjectCode != 1">국어</option>
+								<option value="2" v-if="target.subjectCode != 2">영어</option>
+								<option value="3" v-if="target.subjectCode != 3">수학</option>
+								<option value="4" v-if="target.subjectCode != 4">과학</option>
+								<option value="5" v-if="target.subjectCode != 5">사회</option>
+								<option value="6" v-if="target.subjectCode != 6">역사</option>
+							</select>
+						</div>
+					</div>
+					
+				</div>	
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" v-on:click="chanegSubject()">변경</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">취소</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End Modal -->
+	
+</div>
+
+</th:block>
+
+<th:block layout:fragment="vuejs">
+	<script th:attr="src=@{'/js/vue/memberVue.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customScript">
+	<script th:attr="src=@{'/js/custom/member.js?ver=' + ${@environment.getProperty('app.version')}}"></script>
+</th:block>
+
+<th:block layout:fragment="customStyle">
+	<link rel="stylesheet" th:attr="href=@{'/css/custom/member.css?ver=' + ${@environment.getProperty('app.version')}}">
+</th:block>
+
+</html>
